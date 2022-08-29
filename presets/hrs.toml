@@ -1,0 +1,26 @@
+[device]
+name = "my_device"
+address = "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+autoconnect = false
+
+[[services.hrs]]
+name = "Heart_rate_services"
+uuid = "180d"
+
+[[services.hrs.characteristics.mesurement]]
+name = "Heart_rate_mesurement"
+uuid = "2a37"
+
+[[services.hrs.characteristics.location]]
+name = "Body_sensor_location"
+uuid = "2a38"
+
+[[commands.get_location]]
+command_type = "read"
+service = "Heart_rate_services"
+characteristic = "Body_sensor_location"
+
+[[commands.get_rate]]
+command_type = "read"
+service = "Heart_rate_services"
+characteristic = "Heart_rate_mesurement"
