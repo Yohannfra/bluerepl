@@ -103,7 +103,7 @@ impl BtleplugController {
             }
         };
 
-        println!("{:?}", adapter);
+        println!("Using BLE adapter: {:?}", adapter.adapter_info().await.unwrap());
 
         BtleplugController {
             controller_name: String::from("btleplug"),
