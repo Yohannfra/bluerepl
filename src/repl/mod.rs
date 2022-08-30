@@ -27,7 +27,7 @@ impl Repl {
     }
 
     fn get_line(&mut self) -> String {
-        let readline = self.editor.readline(">>");
+        let readline = self.editor.readline(">> ");
         match readline {
             Ok(line) => {
                 self.editor.add_history_entry(line.as_str());

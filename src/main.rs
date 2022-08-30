@@ -1,7 +1,5 @@
 extern crate exitcode;
 
-use futures::executor::block_on;
-use tokio::time;
 mod controllers;
 mod preset;
 mod repl;
@@ -28,6 +26,8 @@ struct Args {
 
 #[tokio::main]
 async fn main() {
+    println!("BlueREPL Version: {}", env!("CARGO_PKG_VERSION"));
+
     let args = Args::parse();
 
     let mut repl = Repl::new();
