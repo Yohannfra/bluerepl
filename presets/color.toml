@@ -2,33 +2,33 @@
 device_name = "my_device"
 device_address = "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
 
-[[services.color]]
+[services.color]
 name = "color_service"
 uuid = "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
 
-[[services.color.characteristics.rgb]]
+[services.color.characteristics.rgb]
 name = "rgb"
 uuid = "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
 
-[[commands.led_red]]
+[commands.led_red]
 command_type = "write"
 service = "color_service"
 characteristic = "rgb"
-payload = [0xff, 0x00, 0x00]
+payload = "0xff 0x00 0x00"
 
-[[commands.led_green]]
+[commands.led_green]
 command_type = "write"
 service = "color_service"
 characteristic = "rgb"
-payload = [0x00, 0xff, 0x00]
+payload = "0x00 0xff 0x00"
 
-[[commands.led_blue]]
+[commands.led_blue]
 command_type = "write"
 service = "color_service"
 characteristic = "rgb"
-payload = [0x00, 0x00, 0xff]
+payload = "0x00 0x00 0xff"
 
-[[commands.get_color]]
+[commands.get_color]
 command_type = "read"
 service = "color_service"
 characteristic = "rgb"
