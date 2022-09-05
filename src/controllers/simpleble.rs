@@ -15,7 +15,6 @@ impl BleController for SimpleBleController {
     async fn scan(
         &self,
         scan_time_s: u32,
-        print_result: bool,
     ) -> Result<Vec<BlePeripheral>, Box<dyn Error>> {
         println!("Scanning for {} seconds...", scan_time_s);
         Ok(Vec::new())

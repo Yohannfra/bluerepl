@@ -30,7 +30,13 @@ async fn main() {
 
     let args = Args::parse();
 
-    let mut repl = Repl::new();
+    let bt: Box<dyn BleController> = match args.ble_lib {
+        1 => Box::new(btleplug::BtleplugController::new().await),
+        2 => Box::new(simpleble::SimpleBleController::new()),
+        n => panic!("Unknown controller id {}", n),
+    };
+
+    let mut repl = Repl::new(bt);
 
     if args.preset_file != None {
         let pr = match Preset::new(args.preset_file.unwrap()) {
@@ -42,14 +48,5 @@ async fn main() {
         };
         pr.print();
     }
-
-    // TODO
-    let bt = controllers::btleplug::BtleplugController::new().await;
-    // match args.ble_lib {
-    //     1 => bt = dyn controllers::btleplug::BtleplugController::new(),
-    //     2 => bt = dyn controllers::simpleble::SimpleBleController::new(),
-    //     n => panic!("Unknown controller id {}", n),
-    // };
-
-    repl.start().expect("An error occured");
+    repl.start().await.expect("An error occured");
 }

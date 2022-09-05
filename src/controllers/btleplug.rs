@@ -23,11 +23,7 @@ pub struct BtleplugController {
 
 #[async_trait]
 impl BleController for BtleplugController {
-    async fn scan(
-        &self,
-        scan_time_s: u32,
-        print_result: bool,
-    ) -> Result<Vec<BlePeripheral>, Box<dyn Error>> {
+    async fn scan(&self, scan_time_s: u32) -> Result<Vec<BlePeripheral>, Box<dyn Error>> {
         println!("Scanning for {} seconds...", scan_time_s);
 
         self.adapter
@@ -41,21 +37,10 @@ impl BleController for BtleplugController {
 
         for p in peripherals {
             let properties = p.properties().await?.unwrap();
-            let local_name = properties
-                .local_name
-                .unwrap_or(String::from("(name unknown)"));
-            let mac = properties.address;
-
-            let per = BlePeripheral {
-                name: local_name,
-                mac_addr: mac.to_string(),
-            };
-            if print_result {
-                println!("mac_addr = {}\tname = {}", per.mac_addr, per.name);
-            }
-            periph_vec.push(per);
+            let name = properties.local_name.unwrap_or(String::from("unknown"));
+            let mac_addr = properties.address.to_string();
+            periph_vec.push(BlePeripheral { name, mac_addr });
         }
-
         Ok(periph_vec)
     }
 
@@ -103,7 +88,10 @@ impl BtleplugController {
             }
         };
 
-        println!("Using BLE adapter: {:?}", adapter.adapter_info().await.unwrap());
+        println!(
+            "Using BLE adapter: {:?}",
+            adapter.adapter_info().await.unwrap()
+        );
 
         BtleplugController {
             controller_name: String::from("btleplug"),

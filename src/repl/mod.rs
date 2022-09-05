@@ -1,29 +1,26 @@
 use rustyline::error::ReadlineError;
 use rustyline::{Editor, Result};
 
-use crate::utils;
+mod cli;
+
+mod commands;
 
 use crate::controllers;
+use controllers::BleController;
 
 pub struct Repl {
-    last_exit_code: i32,
-    bt: Option<Box<dyn controllers::BleController>>,
+    bt: Box<dyn BleController>,
     editor: Editor<()>,
 }
 
 const HISTORY_FP: &str = ".history.txt";
 
 impl Repl {
-    pub fn new() -> Repl {
+    pub fn new(bt: Box<dyn controllers::BleController>) -> Repl {
         Repl {
-            last_exit_code: 0,
-            bt: None,
+            bt,
             editor: Editor::<()>::new().unwrap(),
         }
-    }
-
-    pub fn set_ble_controller(&mut self, ctl: &mut dyn controllers::BleController) {
-        // self.bt = Some(Box::new(ctl));
     }
 
     fn get_line(&mut self) -> String {
@@ -49,21 +46,103 @@ impl Repl {
         }
     }
 
-    pub fn start(&mut self) -> Result<()> {
+    pub async fn start(&mut self) -> Result<()> {
         if self.editor.load_history(HISTORY_FP).is_err() {
             println!("No previous history.");
         }
 
+        let mut scan_list: Vec<controllers::BlePeripheral> = Vec::new();
+
         loop {
             let line = self.get_line();
-            let sp: Vec<String> = utils::split_line_in_args(line);
-            if sp.is_empty() {
+
+            if line.trim().is_empty() {
                 continue;
             }
 
-            // let command = sp[0];
+            let args = shlex::split(&line).ok_or("error: Invalid quoting").unwrap();
+            println!("{:?}", args);
 
-            println!("{:?}", sp);
+            let matches = cli::cli().try_get_matches_from(&args);
+
+            if matches.is_err() {
+                println!("{}", matches.unwrap_err());
+                continue;
+            }
+
+            match matches.unwrap().subcommand() {
+                Some(("quit", _)) => {
+                    println!("EOF, bye");
+                    std::process::exit(exitcode::OK);
+                }
+
+                Some(("clear", _)) => {
+                    if cfg!(windows) {
+                        std::process::Command::new("cls").status().unwrap();
+                    } else {
+                        std::process::Command::new("clear").status().unwrap();
+                    }
+                }
+
+                Some(("write", mt)) => {
+                    println!("{:?}", mt);
+                }
+
+                Some(("read", mt)) => {
+                    println!("{:?}", mt);
+                }
+
+                Some(("scan", mt)) => {
+                    let timeout: u32;
+
+                    let show_all = mt.is_present("all");
+
+                    if mt.is_present("list") {
+                        commands::scan::print_scan_list(&scan_list, show_all);
+                        continue;
+                    }
+
+                    match mt.get_one::<String>("timeout").unwrap().parse::<u32>() {
+                        Ok(n) => timeout = n,
+                        Err(e) => {
+                            eprintln!("{}", e);
+                            continue;
+                        }
+                    };
+
+                    scan_list = commands::scan::run(&mut self.bt, timeout, show_all).await;
+                }
+
+                Some(("info", mt)) => {
+                    println!("{:?}", mt);
+                }
+
+                Some(("connect", mt)) => {
+                    println!("{:?}", mt);
+                }
+
+                Some(("disconnect", mt)) => {
+                    println!("{:?}", mt);
+                }
+
+                Some(("indicate", mt)) => {
+                    println!("{:?}", mt);
+                }
+
+                Some(("notify", mt)) => {
+                    println!("{:?}", mt);
+                }
+
+                Some(("unsubscribe", mt)) => {
+                    println!("{:?}", mt);
+                }
+
+                // Some((name, _matches)) => unimplemented!("{}", name),
+                // None => unreachable!("subcommand required"),
+                _ => {
+                    eprintln!("Unknown command: '{}'", &line);
+                }
+            }
         }
     }
 }

@@ -149,8 +149,7 @@ mod tests {
 
         for fp in test_files {
             match Preset::new(path::PathBuf::from(fp)) {
-                Ok(_) => {
-                }
+                Ok(_) => {}
                 Err(e) => {
                     eprintln!("{}", e);
                     assert!(false)
