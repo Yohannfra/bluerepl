@@ -8,6 +8,7 @@ pub mod simpleble;
 pub struct BlePeripheral {
     pub name: String,
     pub mac_addr: String,
+    pub rssi: i16,
 }
 
 #[async_trait]

@@ -4,17 +4,19 @@ use controllers::BlePeripheral;
 
 use comfy_table::Table;
 
+use std::error::Error;
+
 pub fn print_scan_list(list: &Vec<BlePeripheral>, show_all: bool) {
     let mut table = Table::new();
 
-    table.add_row(vec!["Index", "Name", "Mac"]);
+    table.add_row(vec!["Index", "Name", "Mac", "RSSI"]);
 
     let mut index = 0;
     for p in list {
         if show_all == false && p.name == "unknown" {
             continue;
         }
-        table.add_row(vec![&index.to_string(), &p.name, &p.mac_addr]);
+        table.add_row(vec![&index.to_string(), &p.name, &p.mac_addr, &p.rssi.to_string()]);
         index += 1;
     }
 
@@ -26,17 +28,14 @@ pub fn print_scan_list(list: &Vec<BlePeripheral>, show_all: bool) {
     println!("{table}");
 }
 
-pub async fn run(bt: &mut Box<dyn controllers::BleController>, timeout: u32, show_all: bool) -> Vec<BlePeripheral> {
-    let res = bt.scan(timeout).await;
+pub async fn run(
+    bt: &mut Box<dyn controllers::BleController>,
+    timeout: u32,
+    show_all: bool,
+) -> Result<Vec<BlePeripheral>, Box<dyn Error>> {
+    let res = bt.scan(timeout).await?;
 
-    if res.is_err() {
-        eprintln!("{:?}", res.unwrap_err());
-        return Vec::new();
-    }
+    print_scan_list(&res, show_all);
 
-    let list = res.unwrap();
-
-    print_scan_list(&list, show_all);
-
-    list
+    Ok(res)
 }

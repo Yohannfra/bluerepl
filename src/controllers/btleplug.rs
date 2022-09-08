@@ -39,7 +39,8 @@ impl BleController for BtleplugController {
             let properties = p.properties().await?.unwrap();
             let name = properties.local_name.unwrap_or(String::from("unknown"));
             let mac_addr = properties.address.to_string();
-            periph_vec.push(BlePeripheral { name, mac_addr });
+            let rssi: i16 = properties.rssi.unwrap_or(0);
+            periph_vec.push(BlePeripheral { name, mac_addr, rssi });
         }
         Ok(periph_vec)
     }

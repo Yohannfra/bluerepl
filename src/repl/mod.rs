@@ -110,7 +110,13 @@ impl Repl {
                         }
                     };
 
-                    scan_list = commands::scan::run(&mut self.bt, timeout, show_all).await;
+                    scan_list = match commands::scan::run(&mut self.bt, timeout, show_all).await {
+                        Ok(l) => l,
+                        Err(e) => {
+                            eprintln!("{}", e);
+                            continue;
+                        }
+                    };
                 }
 
                 Some(("info", mt)) => {
