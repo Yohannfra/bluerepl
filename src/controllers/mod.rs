@@ -7,7 +7,11 @@ pub mod simpleble;
 #[derive(Debug)]
 pub struct BlePeripheral {
     pub name: String,
-    pub mac_addr: String,
+
+    /// ble 128bytes uuid address
+    pub address_uuid: String,
+
+    /// peripheral rssi
     pub rssi: i16,
 }
 
