@@ -89,8 +89,6 @@ impl Repl {
                 }
 
                 Some(("scan", mt)) => {
-                    let timeout: u32;
-
                     let show_all = mt.is_present("all");
 
                     if mt.is_present("list") {
@@ -98,8 +96,8 @@ impl Repl {
                         continue;
                     }
 
-                    match mt.get_one::<String>("timeout").unwrap().parse::<u32>() {
-                        Ok(n) => timeout = n,
+                    let timeout = match mt.get_one::<String>("timeout").unwrap().parse::<u32>() {
+                        Ok(n) => n,
                         Err(e) => {
                             eprintln!("{}", e);
                             continue;
@@ -120,11 +118,40 @@ impl Repl {
                 }
 
                 Some(("connect", mt)) => {
-                    println!("{:?}", mt);
+                    if mt.is_present("name") {
+                        let name = mt.get_one::<String>("name").unwrap();
+                        commands::connect::by_name(&mut self.bt, &scan_list, name)
+                            .await
+                            .unwrap();
+                    } else if mt.is_present("mac") {
+                        let addr = mt.get_one::<String>("mac").unwrap();
+                        commands::connect::by_address(&mut self.bt, &scan_list, addr)
+                            .await
+                            .unwrap();
+                    } else if mt.is_present("id") {
+                        let index = match mt.get_one::<String>("id").unwrap().parse::<usize>() {
+                            Ok(n) => n,
+                            Err(e) => {
+                                eprintln!("{}", e);
+                                continue;
+                            }
+                        };
+                        match commands::connect::by_index(&mut self.bt, &scan_list, index).await {
+                            Ok(()) => println!("Connected"),
+                            Err(e) => eprintln!("{}", e),
+                        }
+                    }
                 }
 
-                Some(("disconnect", mt)) => {
-                    println!("{:?}", mt);
+                Some(("disconnect", _mt)) => {
+                    if self.bt.is_connected() == false {
+                        println!("You must be connected to a peripheral to run this command");
+                    } else {
+                        match commands::disconnect::run(&mut self.bt).await {
+                            Ok(()) => println!("Disconnected"),
+                            Err(e) => eprintln!("{}", e),
+                        }
+                    }
                 }
 
                 Some(("indicate", mt)) => {

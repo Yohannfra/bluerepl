@@ -11,11 +11,7 @@ use btleplug::api::{Central, Manager as _, Peripheral, ScanFilter};
 use btleplug::platform::{Adapter, Manager};
 
 pub struct BtleplugController {
-    controller_name: String,
-    peripheral_name: Option<String>,
-    peripheral_mac: Option<String>,
     connected: bool,
-    manager: Manager,
     adapter: Adapter,
 }
 
@@ -51,15 +47,40 @@ impl BleController for BtleplugController {
         Ok(periph_vec)
     }
 
-    fn connect_by_name(&self, name: String) -> Result<(), Box<dyn Error>> {
-        Ok(())
+    async fn connect(&mut self, uuid: &str) -> Result<(), Box<dyn Error>> {
+        let peripherals = self.adapter.peripherals().await?;
+
+        for p in &peripherals {
+            let properties = p.properties().await?.unwrap();
+            let name = properties.local_name.unwrap_or(String::from("unknown"));
+
+            if uuid == p.id().to_string() {
+                println!("Connecting to {} with uuid: {}", name,  p.id().to_string());
+                match p.connect().await {
+                    Ok(()) => {
+                        self.connected = true;
+                        return Ok(())}
+                    ,
+                    Err(e) => return Err(format!("{}", e).as_str().into()),
+                }
+            }
+        }
+        Err(format!("Peripheral with uuid {} not found", uuid).as_str().into())
     }
 
-    fn connect_by_mac(&self, mac: String) -> Result<(), Box<dyn Error>> {
-        Ok(())
-    }
+    async fn disconnect(&mut self) -> Result<(), Box<dyn Error>> {
+        let peripherals = self.adapter.peripherals().await?;
 
-    fn disconnect(&self) -> Result<(), Box<dyn Error>> {
+        for p in &peripherals {
+            if p.is_connected().await? {
+                let properties = p.properties().await?.unwrap();
+                let name = properties.local_name.unwrap_or(String::from("unknown"));
+                println!("Disconnecting from {} with uuid: {} ... ", name,  p.id().to_string());
+                self.connected = false;
+                p.disconnect().await?;
+                break;
+            }
+        }
         Ok(())
     }
 
@@ -72,12 +93,12 @@ impl BtleplugController {
     pub async fn new() -> BtleplugController {
         let manager = match Manager::new().await {
             Ok(m) => m,
-            Err(e) => panic!("{}", e),
+            Err(e) => panic!("{:?}", e),
         };
 
         let adapter_list = match manager.adapters().await {
             Ok(v) => v,
-            Err(e) => panic!("{}", e),
+            Err(e) => panic!("{:?}", e),
         };
 
         let adapter = match adapter_list.len() {
@@ -101,11 +122,7 @@ impl BtleplugController {
         );
 
         BtleplugController {
-            controller_name: String::from("btleplug"),
-            peripheral_name: None,
-            peripheral_mac: None,
             connected: false,
-            manager,
             adapter: adapter.clone(),
         }
     }

@@ -79,9 +79,9 @@ pub fn cli() -> Command<'static> {
             Command::new("connect")
             .about("Connect to a BLE peripheral")
             .args(&[
-                Arg::new("index").help("Connection using the index of the peripheral in the scan list").required(true).exclusive(true),
-                Arg::new("name").help("Connection using the name of the peripheral").required(true).exclusive(true),
-                Arg::new("mac").help("Connection using the mac address of the peripheral").required(true).exclusive(true),
+                arg!(-n --name ... "Connection using the name of the peripheral").takes_value(true).exclusive(true).required(true),
+                arg!(-m --mac ... "Connection using the mac address of the peripheral").takes_value(true).exclusive(true).required(true),
+                arg!(-i --id ... "Connection using the id of the peripheral in the scan list").takes_value(true).exclusive(true).required(true),
             ]).help_template(COMMAND_TEMPLATE))
 
         // disconnect
