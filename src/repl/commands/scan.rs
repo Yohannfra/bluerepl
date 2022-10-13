@@ -9,7 +9,7 @@ use std::error::Error;
 pub fn print_scan_list(list: &Vec<BlePeripheral>, show_all: bool) {
     let mut table = Table::new();
 
-    table.add_row(vec!["Index", "Name", "UUID", "RSSI"]);
+    table.add_row(vec!["ID", "Name", "UUID", "RSSI"]);
 
     let mut index = 0;
     for p in list {
@@ -17,7 +17,7 @@ pub fn print_scan_list(list: &Vec<BlePeripheral>, show_all: bool) {
             continue;
         }
         table.add_row(vec![
-            &index.to_string(),
+            &p.id.to_string(),
             &p.name,
             &p.address_uuid,
             &p.rssi.to_string(),

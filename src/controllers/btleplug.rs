@@ -1,7 +1,6 @@
 use super::{BleController, BlePeripheral};
 use async_trait::async_trait;
 use std::error::Error;
-use std::fmt::Debug;
 use std::time::Duration;
 use tokio::time;
 
@@ -36,18 +35,13 @@ impl BleController for BtleplugController {
         let mut index: usize = 0;
 
         for p in peripherals {
-
             let properties = p.properties().await?.unwrap();
             let name = properties.local_name.unwrap_or(String::from("unknown"));
             let rssi: i16 = properties.rssi.unwrap_or(0);
 
-            let mut uuid_str = format!("{:?}", p.id());
-            uuid_str.pop().unwrap();
-            let uuid_str = &uuid_str[13..];
-
             periph_vec.push(BlePeripheral {
                 name,
-                address_uuid: uuid_str.to_string(),
+                address_uuid: p.id().to_string(),
                 rssi,
                 id: index,
             });
