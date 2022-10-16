@@ -6,11 +6,15 @@ mod cli;
 mod commands;
 
 use crate::controllers;
+use crate::preset::Preset;
 use controllers::BleController;
+
+use std::error::Error;
 
 pub struct Repl {
     bt: Box<dyn BleController>,
     editor: Editor<()>,
+    preset: Option<Preset>,
 }
 
 const HISTORY_FP: &str = ".history.txt";
@@ -20,7 +24,12 @@ impl Repl {
         Repl {
             bt,
             editor: Editor::<()>::new().unwrap(),
+            preset: None,
         }
+    }
+
+    pub fn set_preset(&mut self, pr: Preset) {
+        self.preset = Some(pr);
     }
 
     fn get_line(&mut self) -> String {
@@ -40,18 +49,102 @@ impl Repl {
                 std::process::exit(exitcode::OK);
             }
             Err(err) => {
-                println!("Error: {:?}", err);
-                std::process::exit(exitcode::DATAERR);
+                panic!("{}", err)
             }
         }
     }
 
-    pub async fn start(&mut self) -> Result<()> {
+    async fn execute_command(
+        &mut self,
+        matches: clap::ArgMatches,
+    ) -> core::result::Result<(), Box<dyn Error>> {
+        match matches.subcommand() {
+            Some(("quit", _)) => {
+                println!("EOF, bye");
+                std::process::exit(exitcode::OK);
+            }
+
+            Some(("clear", _)) => {
+                commands::clear::run();
+            }
+
+            Some(("write", mt)) => {
+                println!("{:?}", mt);
+            }
+
+            Some(("read", mt)) => {
+                println!("{:?}", mt);
+            }
+
+            Some(("scan", mt)) => {
+                let show_all = mt.contains_id("all");
+
+                if mt.contains_id("list") {
+                    commands::scan::print_scan_list(&self.bt.get_scan_list(), show_all)?;
+                }
+
+                let timeout = *mt.get_one::<usize>("timeout").unwrap();
+
+                commands::scan::run(&mut self.bt, timeout, show_all).await?;
+            }
+
+            Some(("info", mt)) => {
+                let topic = mt.get_one::<String>("topic").unwrap();
+                match topic.as_str() {
+                    // "adapter" => ,
+                    // gatt => ,
+                    "preset" => {
+                        if self.preset.is_some() {
+                            self.preset.as_ref().unwrap().print();
+                        }
+                    }
+                    _ => panic!("Invalid topic value (should not happend"),
+                }
+            }
+
+            Some(("connect", mt)) => {
+                if mt.contains_id("name") {
+                    let name = mt.get_one::<String>("name").unwrap();
+                    commands::connect::by_name(&mut self.bt, name).await?;
+                } else if mt.contains_id("mac") {
+                    let addr = mt.get_one::<String>("mac").unwrap();
+                    commands::connect::by_address(&mut self.bt, addr).await?;
+                } else if mt.contains_id("id") {
+                    let index = *mt.get_one::<usize>("id").unwrap();
+                    commands::connect::by_index(&mut self.bt, index).await?;
+                }
+            }
+
+            Some(("disconnect", _mt)) => {
+                if self.bt.is_connected() == false {
+                    Err("You must be connected to a peripheral to run this command")?;
+                } else {
+                    commands::disconnect::run(&mut self.bt).await?;
+                }
+            }
+
+            Some(("indicate", mt)) => {
+                println!("{:?}", mt);
+            }
+
+            Some(("notify", mt)) => {
+                println!("{:?}", mt);
+            }
+
+            Some(("unsubscribe", mt)) => {
+                println!("{:?}", mt);
+            }
+            _ => {
+                eprintln!("Unknown command: '{:?}'", matches);
+            }
+        }
+        Ok(())
+    }
+
+    pub async fn start(&mut self) -> ! {
         if self.editor.load_history(HISTORY_FP).is_err() {
             println!("No previous history.");
         }
-
-        let mut scan_list: Vec<controllers::BlePeripheral> = Vec::new();
 
         loop {
             let line = self.get_line();
@@ -60,116 +153,23 @@ impl Repl {
                 continue;
             }
 
-            let args = shlex::split(&line).ok_or("error: Invalid quoting").unwrap();
-            println!("{:?}", args);
+            let args = match shlex::split(&line).ok_or("Parsing error: Invalid quoting") {
+                Ok(a) => a,
+                Err(e) => {
+                    eprintln!("{}", e);
+                    continue;
+                }
+            };
 
             let matches = cli::cli().try_get_matches_from(&args);
 
             if matches.is_err() {
                 println!("{}", matches.unwrap_err());
                 continue;
-            }
-
-            match matches.unwrap().subcommand() {
-                Some(("quit", _)) => {
-                    println!("EOF, bye");
-                    std::process::exit(exitcode::OK);
-                }
-
-                Some(("clear", _)) => {
-                    commands::clear::run();
-                }
-
-                Some(("write", mt)) => {
-                    println!("{:?}", mt);
-                }
-
-                Some(("read", mt)) => {
-                    println!("{:?}", mt);
-                }
-
-                Some(("scan", mt)) => {
-                    let show_all = mt.is_present("all");
-
-                    if mt.is_present("list") {
-                        commands::scan::print_scan_list(&scan_list, show_all);
-                        continue;
-                    }
-
-                    let timeout = match mt.get_one::<String>("timeout").unwrap().parse::<u32>() {
-                        Ok(n) => n,
-                        Err(e) => {
-                            eprintln!("{}", e);
-                            continue;
-                        }
-                    };
-
-                    scan_list = match commands::scan::run(&mut self.bt, timeout, show_all).await {
-                        Ok(l) => l,
-                        Err(e) => {
-                            eprintln!("{}", e);
-                            continue;
-                        }
-                    };
-                }
-
-                Some(("info", mt)) => {
-                    println!("{:?}", mt);
-                }
-
-                Some(("connect", mt)) => {
-                    if mt.is_present("name") {
-                        let name = mt.get_one::<String>("name").unwrap();
-                        commands::connect::by_name(&mut self.bt, &scan_list, name)
-                            .await
-                            .unwrap();
-                    } else if mt.is_present("mac") {
-                        let addr = mt.get_one::<String>("mac").unwrap();
-                        commands::connect::by_address(&mut self.bt, &scan_list, addr)
-                            .await
-                            .unwrap();
-                    } else if mt.is_present("id") {
-                        let index = match mt.get_one::<String>("id").unwrap().parse::<usize>() {
-                            Ok(n) => n,
-                            Err(e) => {
-                                eprintln!("{}", e);
-                                continue;
-                            }
-                        };
-                        match commands::connect::by_index(&mut self.bt, &scan_list, index).await {
-                            Ok(()) => println!("Connected"),
-                            Err(e) => eprintln!("{}", e),
-                        }
-                    }
-                }
-
-                Some(("disconnect", _mt)) => {
-                    if self.bt.is_connected() == false {
-                        println!("You must be connected to a peripheral to run this command");
-                    } else {
-                        match commands::disconnect::run(&mut self.bt).await {
-                            Ok(()) => println!("Disconnected"),
-                            Err(e) => eprintln!("{}", e),
-                        }
-                    }
-                }
-
-                Some(("indicate", mt)) => {
-                    println!("{:?}", mt);
-                }
-
-                Some(("notify", mt)) => {
-                    println!("{:?}", mt);
-                }
-
-                Some(("unsubscribe", mt)) => {
-                    println!("{:?}", mt);
-                }
-
-                // Some((name, _matches)) => unimplemented!("{}", name),
-                // None => unreachable!("subcommand required"),
-                _ => {
-                    eprintln!("Unknown command: '{}'", &line);
+            } else {
+                match self.execute_command(matches.unwrap()).await {
+                    Ok(_) => (),
+                    Err(e) => eprintln!("{}", e),
                 }
             }
         }

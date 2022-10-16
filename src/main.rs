@@ -6,8 +6,9 @@ mod repl;
 mod utils;
 
 use clap::Parser;
+use controllers::btleplug;
 use controllers::BleController;
-use controllers::{btleplug, simpleble};
+use std::error::Error;
 use preset::Preset;
 use repl::Repl;
 
@@ -17,22 +18,24 @@ struct Args {
     /// Path to the preset file to load
     preset_file: Option<std::path::PathBuf>,
 
-    #[clap(short, default_value_t = 1)]
-    /// Ble lib to use
-    /// 1=btleplug
-    /// 2=simpleble
-    ble_lib: u8,
+    #[clap(short, default_value = "btleplug")]
+    /// Ble lib to use :
+    /// - btleplug
+    /// - simpleble
+    /// - bleuio
+    ble_lib: String,
 }
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<(), Box<dyn Error>> {
     println!("BlueREPL Version: {}", env!("CARGO_PKG_VERSION"));
 
     let args = Args::parse();
 
-    let bt: Box<dyn BleController> = match args.ble_lib {
-        1 => Box::new(btleplug::BtleplugController::new().await),
-        2 => Box::new(simpleble::SimpleBleController::new()),
+    let bt: Box<dyn BleController> = match args.ble_lib.as_str() {
+        "btleplug" => Box::new(btleplug::BtleplugController::new().await),
+        // "simpleble" => Box::new(simpleble::SimpleBleController::new()),
+        // "bleuio" => Box::new(simpleble::BleuIOController::new()),
         n => panic!("Unknown controller id {}", n),
     };
 
@@ -42,11 +45,11 @@ async fn main() {
         let pr = match Preset::new(args.preset_file.unwrap()) {
             Ok(p) => p,
             Err(e) => {
-                eprintln!("{}", e);
-                std::process::exit(1);
+                panic!("{}", e);
             }
         };
         pr.print();
+        repl.set_preset(pr);
     }
-    repl.start().await.expect("An error occured");
+    repl.start().await
 }

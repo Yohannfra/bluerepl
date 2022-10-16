@@ -13,11 +13,12 @@ use btleplug::platform::{Adapter, Manager};
 pub struct BtleplugController {
     connected: bool,
     adapter: Adapter,
+    scan_list: Vec<BlePeripheral>,
 }
 
 #[async_trait]
 impl BleController for BtleplugController {
-    async fn scan(&self, scan_time_s: u32) -> Result<Vec<BlePeripheral>, Box<dyn Error>> {
+    async fn scan(&self, scan_time_s: usize) -> Result<Vec<BlePeripheral>, Box<dyn Error>> {
         println!("Scanning for {} seconds...", scan_time_s);
 
         self.adapter
@@ -47,37 +48,46 @@ impl BleController for BtleplugController {
         Ok(periph_vec)
     }
 
-    async fn connect(&mut self, uuid: &str) -> Result<(), Box<dyn Error>> {
-        let peripherals = self.adapter.peripherals().await?;
+    fn get_scan_list(&self) -> Vec<BlePeripheral> {
+        self.scan_list.clone()
+    }
 
-        for p in &peripherals {
+    async fn connect(&mut self, uuid: &str) -> Result<(), Box<dyn Error>> {
+        for p in &self.adapter.peripherals().await? {
             let properties = p.properties().await?.unwrap();
             let name = properties.local_name.unwrap_or(String::from("unknown"));
 
             if uuid == p.id().to_string() {
-                println!("Connecting to {} with uuid: {}", name,  p.id().to_string());
+                println!("Connecting to {} with uuid: {}", name, p.id().to_string());
                 match p.connect().await {
                     Ok(()) => {
                         self.connected = true;
-                        return Ok(())}
-                    ,
+                        println!("{:?}", p.services());
+                        println!("{:?}", p.characteristics());
+                        return Ok(());
+                    }
                     Err(e) => return Err(format!("{}", e).as_str().into()),
                 }
             }
         }
-        Err(format!("Peripheral with uuid {} not found", uuid).as_str().into())
+        Err(format!("Peripheral with uuid {} not found", uuid)
+            .as_str()
+            .into())
     }
 
     async fn disconnect(&mut self) -> Result<(), Box<dyn Error>> {
-        let peripherals = self.adapter.peripherals().await?;
-
-        for p in &peripherals {
+        for p in &self.adapter.peripherals().await? {
             if p.is_connected().await? {
                 let properties = p.properties().await?.unwrap();
                 let name = properties.local_name.unwrap_or(String::from("unknown"));
-                println!("Disconnecting from {} with uuid: {} ... ", name,  p.id().to_string());
+                println!(
+                    "Disconnecting from {} with uuid: {} ... ",
+                    name,
+                    p.id().to_string()
+                );
                 self.connected = false;
                 p.disconnect().await?;
+                println!("Disconnect");
                 break;
             }
         }
@@ -124,6 +134,7 @@ impl BtleplugController {
         BtleplugController {
             connected: false,
             adapter: adapter.clone(),
+            scan_list: Vec::new(),
         }
     }
 }

@@ -6,12 +6,13 @@ use comfy_table::Table;
 
 use std::error::Error;
 
-pub fn print_scan_list(list: &Vec<BlePeripheral>, show_all: bool) {
+pub fn print_scan_list(list: &Vec<BlePeripheral>, show_all: bool) -> Result<(), Box<dyn Error>> {
     let mut table = Table::new();
 
     table.add_row(vec!["ID", "Name", "UUID", "RSSI"]);
 
-    let mut index = 0;
+    let mut empty_list: bool = true;
+
     for p in list {
         if show_all == false && p.name == "unknown" {
             continue;
@@ -22,25 +23,24 @@ pub fn print_scan_list(list: &Vec<BlePeripheral>, show_all: bool) {
             &p.address_uuid,
             &p.rssi.to_string(),
         ]);
-        index += 1;
+        empty_list = false
     }
 
-    if index == 0 {
-        println!("Empty scan list");
-        return;
+    if empty_list {
+        Err("Empty scan list")?;
     }
 
     println!("{table}");
+
+    Ok(())
 }
 
 pub async fn run(
     bt: &mut Box<dyn controllers::BleController>,
-    timeout: u32,
+    timeout: usize,
     show_all: bool,
-) -> Result<Vec<BlePeripheral>, Box<dyn Error>> {
-    let res = bt.scan(timeout).await?;
+) -> Result<(), Box<dyn Error>> {
+    let scan_list = bt.scan(timeout).await?;
 
-    print_scan_list(&res, show_all);
-
-    Ok(res)
+    print_scan_list(&scan_list, show_all)
 }

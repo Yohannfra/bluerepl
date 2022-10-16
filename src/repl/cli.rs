@@ -59,7 +59,7 @@ pub fn cli() -> Command<'static> {
             Command::new("scan")
             .about("Search for BLE devices around")
             .args(&[
-                Arg::new("timeout").help("Time to scan in seconds").required(false).default_value("5"),
+                Arg::new("timeout").help("Time to scan in seconds").required(false).default_value("5").value_parser(clap::value_parser!(usize)),
                 arg!(-a --all ... "Show unnamed peripheral"),
                 arg!(-l --list ... "Show last scan list (doesn't run a new scan)"),
             ]).help_template(COMMAND_TEMPLATE))
@@ -69,9 +69,7 @@ pub fn cli() -> Command<'static> {
             Command::new("info")
             .about("print informations about topic")
             .args(&[
-                Arg::new("adapter").help("Print informations about BLE adapter").required(true).exclusive(true),
-                Arg::new("service").help("Print informations about connected peripheral").required(true).exclusive(true),
-                Arg::new("preset").help("Print informations about loaded preset").required(true).exclusive(true),
+                arg!(-t --topic ... "Information topic").required(true).takes_value(true).value_parser(["adapter", "gatt", "preset"]),
             ]).help_template(COMMAND_TEMPLATE))
 
         // connect
@@ -81,7 +79,7 @@ pub fn cli() -> Command<'static> {
             .args(&[
                 arg!(-n --name ... "Connection using the name of the peripheral").takes_value(true).exclusive(true).required(true),
                 arg!(-m --mac ... "Connection using the mac address of the peripheral").takes_value(true).exclusive(true).required(true),
-                arg!(-i --id ... "Connection using the id of the peripheral in the scan list").takes_value(true).exclusive(true).required(true),
+                arg!(-i --id ... "Connection using the id of the peripheral in the scan list").takes_value(true).exclusive(true).required(true).value_parser(clap::value_parser!(usize)),
             ]).help_template(COMMAND_TEMPLATE))
 
         // disconnect

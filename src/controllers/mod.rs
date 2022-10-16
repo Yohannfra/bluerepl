@@ -4,7 +4,7 @@ use std::error::Error;
 pub mod btleplug;
 pub mod simpleble;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct BlePeripheral {
     /// Internal id used by ble implementations
     pub id: usize,
@@ -21,7 +21,10 @@ pub struct BlePeripheral {
 
 #[async_trait]
 pub trait BleController {
-    async fn scan(&self, scan_time_s: u32) -> Result<Vec<BlePeripheral>, Box<dyn Error>>;
+    async fn scan(&self, scan_time_s: usize) -> Result<Vec<BlePeripheral>, Box<dyn Error>>;
+
+    fn get_scan_list(&self) -> Vec<BlePeripheral>;
+
     async fn connect(&mut self, uuid: &str) -> Result<(), Box<dyn Error>>;
 
     async fn disconnect(&mut self) -> Result<(), Box<dyn Error>>;
