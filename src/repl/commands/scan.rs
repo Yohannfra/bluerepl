@@ -40,7 +40,7 @@ pub async fn run(
     timeout: usize,
     show_all: bool,
 ) -> Result<(), Box<dyn Error>> {
-    let scan_list = bt.scan(timeout).await?;
+    bt.scan(timeout).await?;
 
-    print_scan_list(&scan_list, show_all)
+    print_scan_list(&bt.get_scan_list(), show_all)
 }

@@ -21,7 +21,7 @@ pub struct BlePeripheral {
 
 #[async_trait]
 pub trait BleController {
-    async fn scan(&self, scan_time_s: usize) -> Result<Vec<BlePeripheral>, Box<dyn Error>>;
+    async fn scan(&mut self, scan_time_s: usize) -> Result<(), Box<dyn Error>>;
 
     fn get_scan_list(&self) -> Vec<BlePeripheral>;
 

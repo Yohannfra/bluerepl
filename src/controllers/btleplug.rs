@@ -18,7 +18,7 @@ pub struct BtleplugController {
 
 #[async_trait]
 impl BleController for BtleplugController {
-    async fn scan(&self, scan_time_s: usize) -> Result<Vec<BlePeripheral>, Box<dyn Error>> {
+    async fn scan(&mut self, scan_time_s: usize) -> Result<(), Box<dyn Error>> {
         println!("Scanning for {} seconds...", scan_time_s);
 
         self.adapter
@@ -45,7 +45,8 @@ impl BleController for BtleplugController {
 
             index += 1;
         }
-        Ok(periph_vec)
+        self.scan_list = periph_vec;
+        Ok(())
     }
 
     fn get_scan_list(&self) -> Vec<BlePeripheral> {
@@ -87,7 +88,6 @@ impl BleController for BtleplugController {
                 );
                 self.connected = false;
                 p.disconnect().await?;
-                println!("Disconnect");
                 break;
             }
         }
