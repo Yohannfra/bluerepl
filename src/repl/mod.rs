@@ -80,7 +80,7 @@ impl Repl {
                 let show_all = mt.contains_id("all");
 
                 if mt.contains_id("list") {
-                    commands::scan::print_scan_list(&self.bt.get_scan_list(), show_all)?;
+                    return commands::scan::print_scan_list(&self.bt.get_scan_list(), show_all);
                 }
 
                 let timeout = *mt.get_one::<usize>("timeout").unwrap();
