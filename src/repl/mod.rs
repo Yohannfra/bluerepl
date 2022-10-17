@@ -1,5 +1,5 @@
 use rustyline::error::ReadlineError;
-use rustyline::{Editor, Result};
+use rustyline::Editor;
 
 mod cli;
 
@@ -57,7 +57,7 @@ impl Repl {
     async fn execute_command(
         &mut self,
         matches: clap::ArgMatches,
-    ) -> core::result::Result<(), Box<dyn Error>> {
+    ) -> Result<(), Box<dyn Error>> {
         match matches.subcommand() {
             Some(("quit", _)) => {
                 println!("EOF, bye");
