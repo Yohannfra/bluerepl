@@ -67,10 +67,14 @@ pub fn cli() -> Command<'static> {
         // info
         .subcommand(
             Command::new("info")
+            .subcommand_required(true)
             .about("print informations about topic")
-            .args(&[
-                arg!(-t --topic ... "Information topic").required(true).takes_value(true).value_parser(["adapter", "gatt", "preset"]),
-            ]).help_template(COMMAND_TEMPLATE))
+            .subcommands(vec![
+                Command::new("adapter").about("Print informations about BLE adapter in use"),
+                Command::new("gatt").about("Print informations about the gatt of the connected peripheral"),
+                Command::new("preset").about("Print the description of the loaded preset"),
+            ]),
+            ).help_template(COMMAND_TEMPLATE)
 
         // connect
         .subcommand(

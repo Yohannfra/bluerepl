@@ -86,25 +86,22 @@ impl Repl {
             }
 
             Some(("info", mt)) => {
-                let topic = mt.get_one::<String>("topic").unwrap();
-                match topic.as_str() {
-                    "adapter" => {
-                        commands::info::adapter(&mut self.bt).await?;
-                    }
-                    "gatt" => {
+                match mt.subcommand_name() {
+                    Some("adapter") => commands::info::adapter(&mut self.bt).await?,
+                    Some("gatt") => {
                         if self.bt.is_connected() == false {
                             Err("You must be connected to a peripheral to run this command")?;
                         }
                         commands::info::gatt(&mut self.bt).await?;
-                    }
-                    "preset" => {
+                    },
+                    Some("preset") => {
                         if self.preset.is_some() {
                             self.preset.as_ref().unwrap().print();
                         } else {
                             Err("No preset loaded")?;
                         }
-                    }
-                    _ => panic!("Invalid topic value (should not happend"),
+                    },
+                    _ => panic!("Code should never be here"),
                 }
             }
 
