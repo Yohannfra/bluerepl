@@ -8,9 +8,9 @@ mod utils;
 use clap::Parser;
 use controllers::btleplug;
 use controllers::BleController;
-use std::error::Error;
 use preset::Preset;
 use repl::Repl;
+use std::error::Error;
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]

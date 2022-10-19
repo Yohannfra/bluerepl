@@ -41,6 +41,7 @@ name = "blerepl-rs"
 version = "0.1.0"
 dependencies = [
  "async-trait",
+ "bitflags",
  "btleplug",
  "clap",
  "comfy-table",

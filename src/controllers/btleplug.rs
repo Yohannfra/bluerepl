@@ -1,4 +1,7 @@
-use super::{BleController, BlePeripheral};
+use super::{
+    BleController, BlePeripheral, BlePeripheralInfo, Characteristic, CharacteristicProperties,
+    Service,
+};
 use async_trait::async_trait;
 use std::error::Error;
 use std::time::Duration;
@@ -53,6 +56,70 @@ impl BleController for BtleplugController {
         self.scan_list.clone()
     }
 
+    async fn get_adapter_infos(&self) -> Result<String, Box<dyn Error>> {
+        let adapter_infos: String = self.adapter.adapter_info().await?;
+        Ok(adapter_infos)
+    }
+
+    async fn get_peripheral_infos(&self) -> Result<BlePeripheralInfo, Box<dyn Error>> {
+        for p in &self.adapter.peripherals().await? {
+            if p.is_connected().await? {
+                let services = p.services();
+                let properties = p.properties().await?.unwrap();
+
+                let mut infos = BlePeripheralInfo {
+                    periph_name: properties.local_name.unwrap_or(String::from("unknown")),
+                    periph_mac: p.id().to_string(),
+                    rssi: properties.rssi.unwrap_or(0),
+                    services: Vec::new(),
+                };
+
+                for s in services {
+                    let mut ser = Service {
+                        uuid: s.uuid.to_string(),
+                        characteriscics: Vec::new(),
+                    };
+
+                    for c in s.characteristics {
+                        let mut car = Characteristic {
+                            uuid: c.uuid.to_string(),
+                            properties: CharacteristicProperties::UNKNOWN,
+                        };
+
+                        if c.properties.contains(btleplug::api::CharPropFlags::WRITE) {
+                            car.properties |= CharacteristicProperties::WRITE;
+                        }
+
+                        if c.properties.contains(btleplug::api::CharPropFlags::READ) {
+                            car.properties |= CharacteristicProperties::READ;
+                        }
+
+                        if c.properties
+                            .contains(btleplug::api::CharPropFlags::WRITE_WITHOUT_RESPONSE)
+                        {
+                            car.properties |= CharacteristicProperties::WRITE_WITHOUT_RESPONSE;
+                        }
+
+                        if c.properties.contains(btleplug::api::CharPropFlags::NOTIFY) {
+                            car.properties |= CharacteristicProperties::NOTIFY;
+                        }
+
+                        if c.properties
+                            .contains(btleplug::api::CharPropFlags::INDICATE)
+                        {
+                            car.properties |= CharacteristicProperties::INDICATE;
+                        }
+
+                        ser.characteriscics.push(car);
+                    }
+                    infos.services.push(ser);
+                }
+                return Ok(infos);
+            }
+        }
+        panic!("Code should not arrive here");
+    }
+
     async fn connect(&mut self, uuid: &str) -> Result<(), Box<dyn Error>> {
         for p in &self.adapter.peripherals().await? {
             let properties = p.properties().await?.unwrap();
@@ -63,17 +130,13 @@ impl BleController for BtleplugController {
                 match p.connect().await {
                     Ok(()) => {
                         self.connected = true;
-                        println!("{:?}", p.services());
-                        println!("{:?}", p.characteristics());
                         return Ok(());
                     }
-                    Err(e) => return Err(format!("{}", e).as_str().into()),
+                    Err(e) => return Err(format!("{}", e))?,
                 }
             }
         }
-        Err(format!("Peripheral with uuid {} not found", uuid)
-            .as_str()
-            .into())
+        Err(format!("Peripheral with uuid {} not found", uuid))?
     }
 
     async fn disconnect(&mut self) -> Result<(), Box<dyn Error>> {
