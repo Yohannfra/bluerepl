@@ -115,6 +115,9 @@ impl Repl {
                 } else if mt.contains_id("id") {
                     let index = *mt.get_one::<usize>("id").unwrap();
                     commands::connect::by_index(&mut self.bt, index).await?;
+                } else {
+                    let identifier = mt.get_one::<String>("identifier").unwrap();
+                    commands::connect::auto_detect_identifier(&mut self.bt, &identifier).await?;
                 }
             }
 
