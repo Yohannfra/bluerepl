@@ -66,7 +66,11 @@ impl Repl {
             }
 
             Some(("write", mt)) => {
-                println!("{:?}", mt);
+                let service = mt.get_one::<String>("service").unwrap();
+                let characteristic = mt.get_one::<String>("characteristic").unwrap();
+                let payload = mt.get_one::<String>("payload").unwrap();
+
+                commands::write::write(&mut self.bt, service, characteristic, payload).await?;
             }
 
             Some(("read", mt)) => {

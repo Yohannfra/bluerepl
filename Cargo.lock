@@ -61,6 +61,7 @@ dependencies = [
  "serde",
  "serde_json",
  "shlex",
+ "str_to_bytes",
  "tokio",
  "toml",
 ]
@@ -1078,6 +1079,16 @@ name = "str-buf"
 version = "1.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9e08d8363704e6c71fc928674353e6b7c23dcea9d82d7012c8faf2a3a025f8d0"
+
+[[package]]
+name = "str_to_bytes"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9680a2b6c474357b54d2d7b44df7c83cada0170d4436651de6281cfeafea6949"
+dependencies = [
+ "regex",
+ "shlex",
+]
 
 [[package]]
 name = "strsim"

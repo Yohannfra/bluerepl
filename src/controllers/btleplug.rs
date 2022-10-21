@@ -61,6 +61,28 @@ impl BleController for BtleplugController {
         Ok(adapter_infos)
     }
 
+    async fn write(&mut self, _service: &str, characteristic: &str, payload: &[u8]) -> Result<(), Box<dyn Error>> {
+        let mut char_found = false;
+
+        for p in &self.adapter.peripherals().await? {
+            if p.is_connected().await? {
+                for c in p.characteristics() {
+                    if c.uuid.to_string() == characteristic {
+                        println!("Writing {:?} to characteristic {}", payload, c.uuid.to_string());
+                        char_found = true;
+                        p.write(&c, payload, btleplug::api::WriteType::WithoutResponse).await?;
+                    }
+                }
+            }
+        }
+
+        if char_found == false {
+            Err(format!("Characteristic: {} not found", characteristic))?
+        }
+
+        Ok(())
+    }
+
     async fn get_peripheral_infos(&self) -> Result<BlePeripheralInfo, Box<dyn Error>> {
         for p in &self.adapter.peripherals().await? {
             if p.is_connected().await? {
