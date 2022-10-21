@@ -24,11 +24,9 @@ impl BleController for BtleplugController {
     async fn scan(&mut self, scan_time_s: usize) -> Result<(), Box<dyn Error>> {
         println!("Scanning for {} seconds...", scan_time_s);
 
-        self.adapter
-            .start_scan(ScanFilter::default())
-            .await
-            .expect("Can't scan BLE adapter for connected devices...");
-        time::sleep(Duration::from_secs(scan_time_s as u64)).await;
+        self.adapter.start_scan(ScanFilter::default()).await?; // start scan
+        time::sleep(Duration::from_secs(scan_time_s as u64)).await;   // wait x seconds
+        self.adapter.stop_scan().await?;                              // stop scan
 
         let peripherals = self.adapter.peripherals().await?;
         let mut periph_vec: Vec<BlePeripheral> = Vec::new();
