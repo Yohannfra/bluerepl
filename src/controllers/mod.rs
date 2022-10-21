@@ -81,6 +81,7 @@ pub trait BleController {
 
     async fn write(&mut self, service: &str, characteristic: &str, payload: &[u8]) -> Result<(), Box<dyn Error>>;
 
+    async fn read(&mut self, service: &str, characteristic: &str) -> Result<(), Box<dyn Error>>;
 
     fn is_connected(&self) -> bool;
 }

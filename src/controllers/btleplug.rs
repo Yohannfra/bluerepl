@@ -81,6 +81,29 @@ impl BleController for BtleplugController {
         Ok(())
     }
 
+    async fn read(&mut self, _service: &str, characteristic: &str) -> Result<(), Box<dyn Error>> {
+        let mut char_found = false;
+
+        for p in &self.adapter.peripherals().await? {
+            if p.is_connected().await? {
+                for c in p.characteristics() {
+                    if c.uuid.to_string() == characteristic {
+                        char_found = true;
+                        println!("Reading Characteristic {} ...", c.uuid.to_string());
+                        let content = p.read(&c).await?;
+                        println!("{:?}", content);
+                    }
+                }
+            }
+        }
+
+        if char_found == false {
+            Err(format!("Characteristic: {} not found", characteristic))?
+        }
+
+        Ok(())
+    }
+
     async fn get_peripheral_infos(&self) -> Result<BlePeripheralInfo, Box<dyn Error>> {
         for p in &self.adapter.peripherals().await? {
             if p.is_connected().await? {
