@@ -67,7 +67,7 @@ impl Preset {
     }
 
     pub fn new(fp: std::path::PathBuf) -> Result<Preset, String> {
-        println!("Loading {} ...", fp.to_string_lossy());
+        println!("Loading {}", fp.to_string_lossy());
         Self::parse_file(fp)
     }
 

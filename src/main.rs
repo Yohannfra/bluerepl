@@ -48,7 +48,6 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 panic!("{}", e);
             }
         };
-        pr.print();
         repl.set_preset(pr);
     }
     repl.start().await
