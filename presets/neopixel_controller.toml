@@ -1,0 +1,28 @@
+[device]
+name = "BLE_NP_CONTROLLER"
+
+autoconnect = false
+
+[services.neopixels]
+name = "neopixels"
+uuid = "8e72bbe5-f777-5284-7849-b4a0b2ac70d2"
+
+[services.neopixels.characteristics.write]
+name = "write"
+uuid = "0000beb6-0000-1000-8000-00805f9b34fb"
+
+[services.neopixels.characteristics.read]
+name = "read"
+uuid = "0000cad8-0000-1000-8000-00805f9b34fb"
+
+[commands.clear_pixels]
+command_type = "write"
+service = "neopixels"
+characteristic = "write"
+payload = "0x01"
+
+[commands.all_red]
+command_type = "write"
+service = "neopixels"
+characteristic = "write"
+payload = "0x03 0xff 0 0"
