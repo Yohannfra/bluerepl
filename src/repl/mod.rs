@@ -92,25 +92,16 @@ impl Repl {
                 commands::scan::run(&mut self.bt, timeout, show_all).await?;
             }
 
-            Some(("info", mt)) => {
-                match mt.subcommand_name() {
-                    Some("adapter") => commands::info::adapter(&mut self.bt).await?,
-                    Some("gatt") => {
-                        if self.bt.is_connected() == false {
-                            Err("You must be connected to a peripheral to run this command")?;
-                        }
-                        commands::info::gatt(&mut self.bt).await?;
-                    },
-                    Some("preset") => {
-                        if self.preset.is_some() {
-                            self.preset.as_ref().unwrap().print();
-                        } else {
-                            Err("No preset loaded")?;
-                        }
-                    },
-                    _ => panic!("Code should never be here"),
+            Some(("info", mt)) => match mt.subcommand_name() {
+                Some("adapter") => commands::info::adapter(&mut self.bt).await?,
+                Some("gatt") => {
+                    if self.bt.is_connected() == false {
+                        Err("You must be connected to a peripheral to run this command")?;
+                    }
+                    commands::info::gatt(&mut self.bt).await?;
                 }
-            }
+                _ => panic!("Code should never be here"),
+            },
 
             Some(("connect", mt)) => {
                 if mt.contains_id("name") {
@@ -147,6 +138,15 @@ impl Repl {
             Some(("unsubscribe", mt)) => {
                 println!("{:?}", mt);
             }
+
+            Some(("preset", _mt)) => {
+                if self.preset.is_some() {
+                    self.preset.as_ref().unwrap().print();
+                } else {
+                    Err("No preset loaded")?;
+                }
+            }
+
             _ => {
                 eprintln!("Unknown command: '{:?}'", matches);
             }

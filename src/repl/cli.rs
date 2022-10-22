@@ -72,7 +72,6 @@ pub fn cli() -> Command<'static> {
             .subcommands(vec![
                 Command::new("adapter").about("Print informations about BLE adapter in use"),
                 Command::new("gatt").about("Print informations about the gatt of the connected peripheral"),
-                Command::new("preset").about("Print the description of the loaded preset"),
             ]),
             ).help_template(COMMAND_TEMPLATE)
 
@@ -101,6 +100,15 @@ pub fn cli() -> Command<'static> {
                 Arg::new("service").help("The service that contains the characteristic to subscribe to").required(true),
                 Arg::new("characteristic").help("The characteristic to subscribe to").required(true),
             ]).help_template(COMMAND_TEMPLATE))
+
+        // preset
+        .subcommand(
+            Command::new("preset")
+            .about("Print preset informations or run preset commands/functions")
+            // .args(&[
+            // TODO
+            // ])
+            .help_template(COMMAND_TEMPLATE))
 
         // notify
         .subcommand(
