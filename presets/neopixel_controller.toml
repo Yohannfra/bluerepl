@@ -35,3 +35,8 @@ command_type = "write"
 service = "neopixels"
 characteristic = "write"
 payload = "0x03 0 0 0xff"
+
+[commands.get_pixels]
+command_type = "read"
+service = "neopixels"
+characteristic = "read"
