@@ -156,6 +156,14 @@ impl Repl {
                                 .run_command(&mut self.bt, &command_name)
                                 .await?;
                         }
+                        Some(("function", arg)) => {
+                            let function_name = arg.get_one::<String>("function_name").unwrap();
+                            self.preset
+                                .as_ref()
+                                .unwrap()
+                                .run_function(&mut self.bt, &function_name)
+                                .await?;
+                        }
                         _ => (),
                     }
                 }

@@ -40,3 +40,7 @@ payload = "0x03 0 0 0xff"
 command_type = "read"
 service = "neopixels"
 characteristic = "read"
+
+[functions.blink_rgb]
+commands_delay_ms = [1000, 1000, 1000, 0]
+commands = ["all_red", "all_green", "all_blue", "clear"]

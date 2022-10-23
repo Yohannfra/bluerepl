@@ -10,6 +10,9 @@ use std::error::Error;
 use std::{fs, path};
 use toml;
 
+use std::time::Duration;
+use tokio::time;
+
 #[derive(Deserialize, Debug)]
 pub struct Preset {
     #[serde(skip_deserializing)]
@@ -17,6 +20,7 @@ pub struct Preset {
     device: Option<Device>,
     services: Option<HashMap<String, Service>>,
     commands: Option<HashMap<String, Command>>,
+    functions: Option<HashMap<String, Function>>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -43,6 +47,12 @@ pub struct Command {
     service: String,
     characteristic: String,
     payload: Option<String>,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct Function {
+    commands_delay_ms: Vec<u64>,
+    commands: Vec<String>,
 }
 
 impl Preset {
@@ -185,6 +195,17 @@ impl Preset {
                 ]);
             }
         }
+
+        // Functions
+        if self.functions.is_some() {
+            table.add_row(vec![Cell::new("Functions").add_attribute(Attribute::Bold)]);
+            for (key, data) in self.functions.as_ref().unwrap() {
+                table.add_row(vec![
+                    "Name\nDelays\nCommands",
+                    &format!("{}\n{:?}\n{:?}", key, data.commands_delay_ms, data.commands,),
+                ]);
+            }
+        }
         println!("{table}");
     }
 
@@ -240,6 +261,32 @@ impl Preset {
 
             _ => panic!("Invalid command type '{}'", command.command_type),
         };
+
+        Ok(())
+    }
+
+    pub async fn run_function(
+        &self,
+        bt: &mut Box<dyn controllers::BleController>,
+        function_name: &str,
+    ) -> Result<(), Box<dyn Error>> {
+        // check if there are no function in preset
+        if self.functions.is_none() {
+            Err("No functions in preset")?;
+        }
+
+        // get fucntion struct from typed name
+        let function = match self.functions.as_ref().unwrap().get(function_name) {
+            Some(s) => s,
+            None => Err(format!("Command not found {}", function_name))?,
+        };
+
+        for (index, command_name) in function.commands.iter().enumerate() {
+            println!("Running {} ...", command_name);
+            self.run_command(bt, command_name).await?;
+            println!("Waiting {} ms", function.commands_delay_ms[index]);
+            time::sleep(Duration::from_millis(function.commands_delay_ms[index])).await;
+        }
 
         Ok(())
     }
