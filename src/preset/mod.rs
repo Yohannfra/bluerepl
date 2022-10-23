@@ -24,14 +24,12 @@ pub struct Device {
 
 #[derive(Deserialize, Debug)]
 pub struct Service {
-    name: String,
     uuid: String,
     characteristics: Option<HashMap<String, Characteristic>>,
 }
 
 #[derive(Deserialize, Debug)]
 pub struct Characteristic {
-    name: String,
     uuid: String,
 }
 
@@ -98,15 +96,15 @@ impl Preset {
         if self.services.is_some() {
             table.add_row(vec![Cell::new("Service").add_attribute(Attribute::Bold)]);
 
-            for (_key, ser) in self.services.as_ref().unwrap() {
-                let fmt_service = format!("{}\n{}", ser.name, ser.uuid);
+            for (key, ser) in self.services.as_ref().unwrap() {
+                let fmt_service = format!("{}\n{}", key, ser.uuid);
                 let mut vec_service = vec!["Name\nUUID".to_owned(), fmt_service];
 
                 if ser.characteristics.is_some() {
-                    for (_key, charac) in ser.characteristics.as_ref().unwrap() {
+                    for (key, charac) in ser.characteristics.as_ref().unwrap() {
                         vec_service[0].push_str("\n\nCharacteristic:\n");
                         vec_service[0].push_str(" - Name:\n - UUID");
-                        vec_service[1].push_str(&format!("\n\n\n{}\n{}", charac.name, charac.uuid));
+                        vec_service[1].push_str(&format!("\n\n\n{}\n{}", key, charac.uuid));
                     }
                 }
                 table.add_row(vec_service);

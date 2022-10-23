@@ -4,19 +4,17 @@ address = "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
 autoconnect = true
 
 [services.battery]
-name = "battery_service"
 uuid = "180f"
 
 [services.battery.characteristics.level]
-name = "level"
 uuid = "2a19"
 
 [commands.read_battery]
 command_type = "read"
-service = "battery_service"
+service = "battery"
 characteristic = "level"
 
 [commands.sub_battery]
 command_type = "notify"
-service = "battery_service"
+service = "battery"
 characteristic = "level"

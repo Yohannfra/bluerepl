@@ -3,24 +3,21 @@ name = "my_device"
 address = "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
 
 [services.nus]
-name = "Nordic_UART_Service"
 uuid = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E"
 
 [services.nus.characteristics.tx]
-name = "tx"
 uuid = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
 
 [services.nus.characteristics.rx]
-name = "rx"
 uuid = "6E400002-B5A3-F393-E0A9-E50E24DCCA9E"
 
 [commands.connect_rx]
 command_type = "notify"
-service = "Nordic_UART_Service"
+service = "nus"
 characteristic = "rx"
 
 [commands.send_hello]
 command_type = "notify"
-service = "Nordic_UART_Service"
+service = "nus"
 characteristic = "rx"
 payload = "hello"
