@@ -66,7 +66,34 @@ impl Preset {
 
     pub fn new(fp: std::path::PathBuf) -> Result<Preset, String> {
         println!("Loading {}", fp.to_string_lossy());
-        Self::parse_file(fp)
+
+        let pr = Self::parse_file(fp)?;
+        pr.verify();
+
+        Ok(pr)
+    }
+
+    fn verify(&self) {
+        // check if services and characteristics typed in commands descriptions are defined in
+        // the preset
+        if self.commands.is_some() {
+            // check services
+            for cmd in self.commands.as_ref().unwrap() {
+                if self.services.is_none() || self.services.as_ref().unwrap().contains_key(&cmd.1.service) == false {
+                    panic!("Service '{}' in command '{}' not found", cmd.1.service, cmd.0);
+                }
+
+                // check characteristics
+                for ser in self.services.as_ref().unwrap() {
+                    if cmd.1.service == *ser.0 {
+                        if ser.1.characteristics.is_none() || ser.1.characteristics.as_ref().unwrap().contains_key(&cmd.1.characteristic) == false {
+                            panic!("Characteristic '{}' in command '{}' not found", cmd.1.characteristic, cmd.0);
+                        }
+                    }
+
+                }
+            }
+        }
     }
 
     pub fn print(&self) {
