@@ -38,9 +38,14 @@ pub fn print_scan_list(list: &Vec<BlePeripheral>, show_all: bool) -> Result<(), 
 pub async fn run(
     bt: &mut Box<dyn controllers::BleController>,
     timeout: usize,
+    print_results: bool,
     show_all: bool,
 ) -> Result<(), Box<dyn Error>> {
     bt.scan(timeout).await?;
 
-    print_scan_list(&bt.get_scan_list(), show_all)
+    if print_results {
+        print_scan_list(&bt.get_scan_list(), show_all)
+    } else {
+        Ok(())
+    }
 }

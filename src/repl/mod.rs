@@ -89,7 +89,7 @@ impl Repl {
 
                 let timeout = *mt.get_one::<usize>("timeout").unwrap();
 
-                commands::scan::run(&mut self.bt, timeout, show_all).await?;
+                commands::scan::run(&mut self.bt, timeout, true, show_all).await?;
             }
 
             Some(("info", mt)) => match mt.subcommand_name() {
@@ -171,6 +171,18 @@ impl Repl {
     pub async fn start(&mut self) -> ! {
         if self.editor.load_history(HISTORY_FP).is_err() {
             println!("No previous history.");
+        }
+
+        if self.preset.is_some() {
+            if self.preset.as_ref().unwrap().should_autoconnect() {
+                println!("autoconnect found in preset, running auto connection");
+                self.preset
+                    .as_ref()
+                    .unwrap()
+                    .autoconnect(&mut self.bt)
+                    .await
+                    .unwrap();
+            }
         }
 
         loop {

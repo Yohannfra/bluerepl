@@ -232,6 +232,23 @@ impl Preset {
 
         Ok(())
     }
+
+    pub fn should_autoconnect(&self) -> bool {
+        if self.device.is_some() {
+            return self.device.as_ref().unwrap().autoconnect.unwrap_or(false);
+        }
+        false
+    }
+
+    pub async fn autoconnect(
+        &self,
+        bt: &mut Box<dyn controllers::BleController>,
+    ) -> Result<(), Box<dyn Error>> {
+        commands::scan::run(bt, 5, false, false).await.unwrap();
+        commands::connect::by_name(bt, &self.device.as_ref().unwrap().name.as_ref().unwrap())
+            .await?;
+        Ok(())
+    }
 }
 
 #[cfg(test)]
