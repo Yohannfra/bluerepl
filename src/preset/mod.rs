@@ -257,11 +257,12 @@ mod tests {
 
     #[test]
     fn test_parse_all_base_presets() {
-        let test_files: [&str; 4] = [
+        let test_files: [&str; 5] = [
             "presets/battery.toml",
             "presets/nus.toml",
             "presets/color.toml",
             "presets/hrs.toml",
+            "presets/neopixel_controller.toml",
         ];
 
         for fp in test_files {
