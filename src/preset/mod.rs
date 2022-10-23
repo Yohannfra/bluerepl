@@ -83,18 +83,33 @@ impl Preset {
         if self.commands.is_some() {
             // check services
             for cmd in self.commands.as_ref().unwrap() {
-                if self.services.is_none() || self.services.as_ref().unwrap().contains_key(&cmd.1.service) == false {
-                    panic!("Service '{}' in command '{}' not found", cmd.1.service, cmd.0);
+                if self.services.is_none()
+                    || self.services.as_ref().unwrap().contains_key(&cmd.1.service) == false
+                {
+                    panic!(
+                        "Service '{}' in command '{}' not found",
+                        cmd.1.service, cmd.0
+                    );
                 }
 
                 // check characteristics
                 for ser in self.services.as_ref().unwrap() {
                     if cmd.1.service == *ser.0 {
-                        if ser.1.characteristics.is_none() || ser.1.characteristics.as_ref().unwrap().contains_key(&cmd.1.characteristic) == false {
-                            panic!("Characteristic '{}' in command '{}' not found", cmd.1.characteristic, cmd.0);
+                        if ser.1.characteristics.is_none()
+                            || ser
+                                .1
+                                .characteristics
+                                .as_ref()
+                                .unwrap()
+                                .contains_key(&cmd.1.characteristic)
+                                == false
+                        {
+                            panic!(
+                                "Characteristic '{}' in command '{}' not found",
+                                cmd.1.characteristic, cmd.0
+                            );
                         }
                     }
-
                 }
             }
         }
@@ -160,6 +175,62 @@ impl Preset {
             }
         }
         println!("{table}");
+    }
+
+    pub async fn run_command(
+        &self,
+        bt: &mut Box<dyn controllers::BleController>,
+        command_name: &str,
+    ) -> Result<(), Box<dyn Error>> {
+        // check if there are no commands in preset
+        if self.commands.is_none() {
+            Err("No commands in preset")?;
+        }
+
+        // get command struct from typed name
+        let command = match self.commands.as_ref().unwrap().get(command_name) {
+            Some(s) => s,
+            None => Err(format!("Command not found {}", command_name))?,
+        };
+
+        let service_def = self
+            .services
+            .as_ref()
+            .unwrap()
+            .get(&command.service)
+            .unwrap();
+
+        // translate human readable service and characteristics names into their uuids
+        let service_uuid = service_def.uuid.clone();
+        let characteristic_uuid = service_def
+            .characteristics
+            .as_ref()
+            .unwrap()
+            .get(&command.characteristic)
+            .unwrap()
+            .uuid
+            .clone();
+
+        // execute command
+        match command.command_type.as_str() {
+            "write" => {
+                commands::write::write(
+                    bt,
+                    &service_uuid,
+                    &characteristic_uuid,
+                    command.payload.as_ref().unwrap(),
+                )
+                .await?;
+            }
+            "read" => {
+                commands::read::read(bt, &service_uuid, &characteristic_uuid).await?;
+            }
+            "notify" => (),
+
+            _ => panic!("Invalid command type '{}'", command.command_type),
+        };
+
+        Ok(())
     }
 }
 

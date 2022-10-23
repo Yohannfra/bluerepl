@@ -3,7 +3,7 @@ use rustyline::Editor;
 
 mod cli;
 
-mod commands;
+pub mod commands;
 
 use crate::controllers;
 use crate::preset::Preset;
@@ -139,11 +139,25 @@ impl Repl {
                 println!("{:?}", mt);
             }
 
-            Some(("preset", _mt)) => {
-                if self.preset.is_some() {
+            Some(("preset", mt)) => {
+                if self.preset.is_none() {
+                    Err("No preset loaded")?;
+                }
+
+                if mt.subcommand().is_none() {
                     self.preset.as_ref().unwrap().print();
                 } else {
-                    Err("No preset loaded")?;
+                    match mt.subcommand() {
+                        Some(("command", arg)) => {
+                            let command_name = arg.get_one::<String>("command_name").unwrap();
+                            self.preset
+                                .as_ref()
+                                .unwrap()
+                                .run_command(&mut self.bt, &command_name)
+                                .await?;
+                        }
+                        _ => (),
+                    }
                 }
             }
 
