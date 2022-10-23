@@ -1,6 +1,6 @@
 [device]
 name = "BLE_NP_CONTROLLER"
-
+address = "17f9eb2e-0267-2430-d287-091d307b6708"
 autoconnect = false
 
 [services.neopixels]

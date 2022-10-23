@@ -113,6 +113,17 @@ impl Preset {
                 }
             }
         }
+
+        // check that if autoconnect=true there is also device name or address
+        if self.device.is_some() {
+            if self.device.as_ref().unwrap().autoconnect.unwrap_or(false) {
+                if self.device.as_ref().unwrap().name.is_none()
+                    && self.device.as_ref().unwrap().address.is_none()
+                {
+                    panic!("You must provide a name or an address to use the autoconnect feature");
+                }
+            }
+        }
     }
 
     pub fn print(&self) {
@@ -245,8 +256,16 @@ impl Preset {
         bt: &mut Box<dyn controllers::BleController>,
     ) -> Result<(), Box<dyn Error>> {
         commands::scan::run(bt, 5, false, false).await.unwrap();
-        commands::connect::by_name(bt, &self.device.as_ref().unwrap().name.as_ref().unwrap())
+        if self.device.as_ref().unwrap().name.is_some() {
+            commands::connect::by_name(bt, &self.device.as_ref().unwrap().name.as_ref().unwrap())
+                .await?;
+        } else {
+            commands::connect::by_address(
+                bt,
+                &self.device.as_ref().unwrap().address.as_ref().unwrap(),
+            )
             .await?;
+        }
         Ok(())
     }
 }
