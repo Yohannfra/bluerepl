@@ -134,6 +134,15 @@ impl Preset {
                 }
             }
         }
+
+        // check that the function commands array is the same length as the function delay array
+        if self.functions.is_some() {
+            for f in self.functions.as_ref().unwrap() {
+                if f.1.commands.len() != f.1.commands_delay_ms.len() {
+                    panic!("In function {} 'commands' and 'commands_delay_ms' don't have the same length", f.0)
+                }
+            }
+        }
     }
 
     pub fn print(&self) {
@@ -281,6 +290,7 @@ impl Preset {
             None => Err(format!("Command not found {}", function_name))?,
         };
 
+        // run function
         for (index, command_name) in function.commands.iter().enumerate() {
             println!("Running {} ...", command_name);
             self.run_command(bt, command_name).await?;
