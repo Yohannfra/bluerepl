@@ -12,7 +12,7 @@ uuid = "0000beb6-0000-1000-8000-00805f9b34fb"
 [services.neopixels.characteristics.read]
 uuid = "0000cad8-0000-1000-8000-00805f9b34fb"
 
-[commands.clear_pixels]
+[commands.clear]
 command_type = "write"
 service = "neopixels"
 characteristic = "write"
@@ -23,3 +23,15 @@ command_type = "write"
 service = "neopixels"
 characteristic = "write"
 payload = "0x03 0xff 0 0"
+
+[commands.all_green]
+command_type = "write"
+service = "neopixels"
+characteristic = "write"
+payload = "0x03 0 0xff 0"
+
+[commands.all_blue]
+command_type = "write"
+service = "neopixels"
+characteristic = "write"
+payload = "0x03 0 0 0xff"
