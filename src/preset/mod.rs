@@ -17,7 +17,7 @@ use tokio::time;
 pub struct Preset {
     #[serde(skip_deserializing)]
     fp: path::PathBuf,
-    device: Option<Device>,
+    pub device: Option<Device>,
     services: Option<HashMap<String, Service>>,
     commands: Option<HashMap<String, Command>>,
     functions: Option<HashMap<String, Function>>,
@@ -27,7 +27,7 @@ pub struct Preset {
 pub struct Device {
     name: Option<String>,
     address: Option<String>,
-    autoconnect: Option<bool>,
+    pub autoconnect: Option<bool>,
 }
 
 #[derive(Deserialize, Debug)]

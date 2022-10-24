@@ -24,6 +24,10 @@ struct Args {
     /// - simpleble
     /// - bleuio
     ble_lib: String,
+
+    /// Override preset 'autoconnect' value with true
+    #[clap(short, long)]
+    autoconnect: bool,
 }
 
 #[tokio::main]
@@ -42,12 +46,17 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let mut repl = Repl::new(bt);
 
     if args.preset_file != None {
-        let pr = match Preset::new(args.preset_file.unwrap()) {
+        let mut pr = match Preset::new(args.preset_file.unwrap()) {
             Ok(p) => p,
             Err(e) => {
                 panic!("{}", e);
             }
         };
+
+        if args.autoconnect {
+            pr.device.as_mut().unwrap().autoconnect = Some(true);
+        }
+
         repl.set_preset(pr);
     }
     repl.start().await
