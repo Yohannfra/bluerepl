@@ -16,7 +16,7 @@ lazy_static! {
 
 pub fn get_service_name_from_uuid(uuid: &str) -> Option<String> {
     for s in PARSED_JSON.iter() {
-        if s.uuid == uuid {
+        if s.uuid.to_uppercase() == uuid.to_uppercase() {
             return Some(s.name.clone());
         }
     }
@@ -25,7 +25,7 @@ pub fn get_service_name_from_uuid(uuid: &str) -> Option<String> {
 
 pub fn get_service_identifier_from_uuid(uuid: &str) -> Option<String> {
     for s in PARSED_JSON.iter() {
-        if s.uuid == uuid {
+        if s.uuid.to_uppercase() == uuid.to_uppercase() {
             return Some(s.identifier.clone());
         }
     }
