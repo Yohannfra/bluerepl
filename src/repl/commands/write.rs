@@ -9,7 +9,6 @@ pub async fn write(
     characteristic: &str,
     payload: &str,
 ) -> Result<(), Box<dyn Error>> {
-
     if bt.is_connected() == false {
         Err("You must be connected to a peripheral to run this command")?;
     }

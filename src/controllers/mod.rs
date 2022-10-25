@@ -79,7 +79,12 @@ pub trait BleController {
 
     async fn disconnect(&mut self) -> Result<(), Box<dyn Error>>;
 
-    async fn write(&mut self, service: &str, characteristic: &str, payload: &[u8]) -> Result<(), Box<dyn Error>>;
+    async fn write(
+        &mut self,
+        service: &str,
+        characteristic: &str,
+        payload: &[u8],
+    ) -> Result<(), Box<dyn Error>>;
 
     async fn read(&mut self, service: &str, characteristic: &str) -> Result<(), Box<dyn Error>>;
 
