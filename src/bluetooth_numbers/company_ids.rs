@@ -8,17 +8,17 @@ struct Company {
     name: String,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
-struct CompanyList {
-    list: Vec<Company>
-}
+// #[derive(Serialize, Deserialize, Debug)]
+// struct CompanyList {
+//     list: Vec<Company>
+// }
 
 lazy_static! {
-    static ref PARSED_JSON: CompanyList = serde_json::from_str(COMPANY_ID_JSON_STR).unwrap();
+    static ref PARSED_JSON: Vec<Company> = serde_json::from_str(COMPANY_ID_JSON_STR).unwrap();
 }
 
 pub fn get_company_name_from_id(code: usize) -> Option<String> {
-    for k in &PARSED_JSON.list {
+    for k in PARSED_JSON.iter() {
         if k.code == code {
             return Some(k.name.clone());
         }
