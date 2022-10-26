@@ -42,8 +42,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let bt: Box<dyn BleController> = match args.ble_lib.as_str() {
         "btleplug" => Box::new(btleplug::BtleplugController::new().await),
-        // "simpleble" => Box::new(simpleble::SimpleBleController::new()),
-        // "bleuio" => Box::new(simpleble::BleuIOController::new()),
+        "simpleble" => todo!("simpleble support is not yet implemented"),
+        "bleuio" => todo!("simpleble support is not yet implemented"),
         n => panic!("Unknown controller id {}", n),
     };
 
