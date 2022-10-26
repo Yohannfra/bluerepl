@@ -50,12 +50,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let mut repl = Repl::new(bt);
 
     if args.preset_file != None {
-        let mut pr = match Preset::new(args.preset_file.unwrap()) {
-            Ok(p) => p,
-            Err(e) => {
-                panic!("{}", e);
-            }
-        };
+        let mut pr = Preset::new(args.preset_file.unwrap()).unwrap();
 
         if args.autoconnect {
             pr.device.as_mut().unwrap().autoconnect = Some(true);
