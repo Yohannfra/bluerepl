@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-static COMPANY_ID_JSON_STR: &'static str = include_str!("company_ids.json");
+static COMPANY_ID_JSON_STR: &str = include_str!("company_ids.json");
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Company {
@@ -18,7 +18,7 @@ pub fn get_company_name_from_id(code: usize) -> Option<String> {
             return Some(k.name.clone());
         }
     }
-    return None;
+    None
 }
 
 #[cfg(test)]

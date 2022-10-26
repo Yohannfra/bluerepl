@@ -15,7 +15,7 @@ fn print_gatt_infos(infos: &BlePeripheralInfo) {
         Cell::new(&infos.periph_name),
     ]);
 
-    table.add_row(vec!["Device address", &format!("{}", &infos.periph_mac,)]);
+    table.add_row(vec!["Device address", &infos.periph_mac.to_string()]);
     table.add_row(vec!["RSSI", &format!("{}", infos.rssi,)]);
 
     table.add_row(vec![Cell::new("Service(s)").add_attribute(Attribute::Bold)]);
@@ -24,8 +24,9 @@ fn print_gatt_infos(infos: &BlePeripheralInfo) {
         let fmt_service = format!(
             "{}\n{}\n{}",
             s.uuid,
-            services_uuids::get_service_name_from_uuid(&s.uuid).unwrap_or("".to_owned()),
-            services_uuids::get_service_identifier_from_uuid(&s.uuid).unwrap_or("".to_owned())
+            services_uuids::get_service_name_from_uuid(&s.uuid).unwrap_or_else(|| "".to_owned()),
+            services_uuids::get_service_identifier_from_uuid(&s.uuid)
+                .unwrap_or_else(|| "".to_owned())
         );
         let mut vec_service = vec!["UUID\nName\nIdentifier".to_owned(), fmt_service];
 
@@ -36,9 +37,9 @@ fn print_gatt_infos(infos: &BlePeripheralInfo) {
                 "\n\n\n{}\n{}\n{}\n{:?}",
                 c.uuid,
                 characteristic_uuids::get_characteristic_name_from_uuid(&c.uuid)
-                    .unwrap_or("".to_owned()),
+                    .unwrap_or_else(|| "".to_owned()),
                 characteristic_uuids::get_characteristic_identifier_from_uuid(&c.uuid)
-                    .unwrap_or("".to_owned()),
+                    .unwrap_or_else(|| "".to_owned()),
                 c.properties
             ));
         }
@@ -49,14 +50,14 @@ fn print_gatt_infos(infos: &BlePeripheralInfo) {
     println!("{table}");
 }
 
-pub async fn gatt(bt: &mut Box<dyn controllers::BleController>) -> Result<(), Box<dyn Error>> {
+pub async fn gatt(bt: &mut dyn controllers::BleController) -> Result<(), Box<dyn Error>> {
     let infos: BlePeripheralInfo = bt.get_peripheral_infos().await?;
     print_gatt_infos(&infos);
 
     Ok(())
 }
 
-pub async fn adapter(bt: &mut Box<dyn controllers::BleController>) -> Result<(), Box<dyn Error>> {
+pub async fn adapter(bt: &mut dyn controllers::BleController) -> Result<(), Box<dyn Error>> {
     let infos = bt.get_adapter_infos().await?;
     println!("{}", infos);
 

@@ -10,8 +10,8 @@ mod repl;
 mod utils;
 
 use clap::Parser;
+
 use controllers::btleplug;
-use controllers::BleController;
 use preset::Preset;
 use repl::Repl;
 use std::error::Error;
@@ -40,14 +40,14 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let args = Args::parse();
 
-    let bt: Box<dyn BleController> = match args.ble_lib.as_str() {
-        "btleplug" => Box::new(btleplug::BtleplugController::new().await),
+    let mut bt = match args.ble_lib.as_str() {
+        "btleplug" => btleplug::BtleplugController::new().await,
         "simpleble" => todo!("simpleble support is not yet implemented"),
-        "bleuio" => todo!("simpleble support is not yet implemented"),
+        "bleuio" => todo!("bleuio support is not yet implemented"),
         n => panic!("Unknown controller id {}", n),
     };
 
-    let mut repl = Repl::new(bt);
+    let mut repl = Repl::new(&mut bt).await;
 
     if args.preset_file != None {
         let mut pr = Preset::new(args.preset_file.unwrap()).unwrap();

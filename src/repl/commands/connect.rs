@@ -5,7 +5,7 @@ use std::env;
 use std::error::Error;
 
 pub async fn by_name(
-    bt: &mut Box<dyn controllers::BleController>,
+    bt: &mut dyn controllers::BleController,
     name: &str,
 ) -> Result<(), Box<dyn Error>> {
     match bt.get_scan_list().iter().find(|e| e.name == name) {
@@ -19,7 +19,7 @@ pub async fn by_name(
 }
 
 pub async fn by_index(
-    bt: &mut Box<dyn controllers::BleController>,
+    bt: &mut dyn controllers::BleController,
     id: usize,
 ) -> Result<(), Box<dyn Error>> {
     match bt.get_scan_list().iter().find(|e| e.id == id) {
@@ -33,7 +33,7 @@ pub async fn by_index(
 }
 
 pub async fn by_address(
-    bt: &mut Box<dyn controllers::BleController>,
+    bt: &mut dyn controllers::BleController,
     addr: &str,
 ) -> Result<(), Box<dyn Error>> {
     match bt.get_scan_list().iter().find(|e| e.address_uuid == addr) {
@@ -47,13 +47,12 @@ pub async fn by_address(
 }
 
 pub async fn auto_detect_identifier(
-    bt: &mut Box<dyn controllers::BleController>,
+    bt: &mut dyn controllers::BleController,
     identifier: &str,
 ) -> Result<(), Box<dyn Error>> {
     // try index
-    match identifier.parse::<usize>() {
-        Ok(n) => return by_index(bt, n).await,
-        Err(_) => (),
+    if let Ok(n) = identifier.parse::<usize>() {
+        return by_index(bt, n).await;
     };
 
     // try mac address (or id on OSX)
@@ -71,5 +70,5 @@ pub async fn auto_detect_identifier(
     }
 
     // try name
-    return by_name(bt, identifier).await;
+    by_name(bt, identifier).await
 }
