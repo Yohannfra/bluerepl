@@ -22,19 +22,22 @@ fn print_gatt_infos(infos: &BlePeripheralInfo) {
 
     for s in &infos.services {
         let fmt_service = format!(
-            "{}\n{}",
+            "{}\n{}\n{}",
             s.uuid,
-            services_uuids::get_service_name_from_uuid(&s.uuid).unwrap_or("".to_owned())
+            services_uuids::get_service_name_from_uuid(&s.uuid).unwrap_or("".to_owned()),
+            services_uuids::get_service_identifier_from_uuid(&s.uuid).unwrap_or("".to_owned())
         );
-        let mut vec_service = vec!["UUID\nName".to_owned(), fmt_service];
+        let mut vec_service = vec!["UUID\nName\nIdentifier".to_owned(), fmt_service];
 
         for c in &s.characteriscics {
             vec_service[0].push_str("\n\nCharacteristic:\n");
-            vec_service[0].push_str(" - UUID:\n - Name\n - Properties");
+            vec_service[0].push_str(" - UUID:\n - Name\n - Identifier\n - Properties");
             vec_service[1].push_str(&format!(
-                "\n\n\n{}\n{}\n{:?}",
+                "\n\n\n{}\n{}\n{}\n{:?}",
                 c.uuid,
                 characteristic_uuids::get_characteristic_name_from_uuid(&c.uuid)
+                    .unwrap_or("".to_owned()),
+                characteristic_uuids::get_characteristic_identifier_from_uuid(&c.uuid)
                     .unwrap_or("".to_owned()),
                 c.properties
             ));
