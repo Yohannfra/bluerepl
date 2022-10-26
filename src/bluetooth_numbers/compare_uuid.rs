@@ -9,11 +9,3 @@ pub fn compare_uuid(uuid_to_check: &str, uuid_ref: &str) -> bool {
 
     false
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_compare_uuid() {}
-}
