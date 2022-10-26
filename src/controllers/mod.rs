@@ -19,6 +19,9 @@ pub struct BlePeripheral {
 
     /// peripheral rssi
     pub rssi: i16,
+
+    /// company_id
+    pub company_id: usize,
 }
 
 bitflags! {

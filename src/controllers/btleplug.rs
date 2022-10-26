@@ -25,8 +25,8 @@ impl BleController for BtleplugController {
         println!("Scanning for {} seconds...", scan_time_s);
 
         self.adapter.start_scan(ScanFilter::default()).await?; // start scan
-        time::sleep(Duration::from_secs(scan_time_s as u64)).await;   // wait x seconds
-        self.adapter.stop_scan().await?;                              // stop scan
+        time::sleep(Duration::from_secs(scan_time_s as u64)).await; // wait x seconds
+        self.adapter.stop_scan().await?; // stop scan
 
         let peripherals = self.adapter.peripherals().await?;
         let mut periph_vec: Vec<BlePeripheral> = Vec::new();
@@ -35,6 +35,12 @@ impl BleController for BtleplugController {
         for p in peripherals {
             let properties = p.properties().await?.unwrap();
             let name = properties.local_name.unwrap_or(String::from("unknown"));
+            let mut company_code = std::usize::MAX;
+            for (code, _) in properties.manufacturer_data {
+                company_code = code as usize;
+                break;
+            }
+
             let rssi: i16 = properties.rssi.unwrap_or(0);
 
             periph_vec.push(BlePeripheral {
@@ -42,6 +48,7 @@ impl BleController for BtleplugController {
                 address_uuid: p.id().to_string(),
                 rssi,
                 id: index,
+                company_id: company_code,
             });
 
             index += 1;
@@ -59,16 +66,26 @@ impl BleController for BtleplugController {
         Ok(adapter_infos)
     }
 
-    async fn write(&mut self, _service: &str, characteristic: &str, payload: &[u8]) -> Result<(), Box<dyn Error>> {
+    async fn write(
+        &mut self,
+        _service: &str,
+        characteristic: &str,
+        payload: &[u8],
+    ) -> Result<(), Box<dyn Error>> {
         let mut char_found = false;
 
         for p in &self.adapter.peripherals().await? {
             if p.is_connected().await? {
                 for c in p.characteristics() {
                     if c.uuid.to_string() == characteristic {
-                        println!("Writing {:?} to characteristic {}", payload, c.uuid.to_string());
+                        println!(
+                            "Writing {:?} to characteristic {}",
+                            payload,
+                            c.uuid.to_string()
+                        );
                         char_found = true;
-                        p.write(&c, payload, btleplug::api::WriteType::WithoutResponse).await?;
+                        p.write(&c, payload, btleplug::api::WriteType::WithoutResponse)
+                            .await?;
                     }
                 }
             }

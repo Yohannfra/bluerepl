@@ -1,5 +1,9 @@
 extern crate exitcode;
 
+#[macro_use]
+extern crate lazy_static;
+
+mod bluetooth_numbers;
 mod controllers;
 mod preset;
 mod repl;
