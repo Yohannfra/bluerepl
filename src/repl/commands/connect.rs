@@ -51,9 +51,8 @@ pub async fn auto_detect_identifier(
     identifier: &str,
 ) -> Result<(), Box<dyn Error>> {
     // try index
-    match identifier.parse::<usize>() {
-        Ok(n) => return by_index(bt, n).await,
-        Err(_) => (),
+    if let Ok(n) = identifier.parse::<usize>() {
+        return by_index(bt, n).await;
     };
 
     // try mac address (or id on OSX)
@@ -71,5 +70,5 @@ pub async fn auto_detect_identifier(
     }
 
     // try name
-    return by_name(bt, identifier).await;
+    by_name(bt, identifier).await
 }

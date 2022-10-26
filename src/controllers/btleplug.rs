@@ -30,15 +30,15 @@ impl BleController for BtleplugController {
 
         let peripherals = self.adapter.peripherals().await?;
         let mut periph_vec: Vec<BlePeripheral> = Vec::new();
-        let mut index: usize = 0;
 
-        for p in peripherals {
+        for (index, p) in peripherals.into_iter().enumerate() {
             let properties = p.properties().await?.unwrap();
-            let name = properties.local_name.unwrap_or(String::from("unknown"));
+            let name = properties
+                .local_name
+                .unwrap_or_else(|| String::from("unknown"));
             let mut company_code = std::usize::MAX;
-            for (code, _) in properties.manufacturer_data {
-                company_code = code as usize;
-                break;
+            if let Some((code, _)) = properties.manufacturer_data.iter().next() {
+                company_code = *code as usize;
             }
 
             let rssi: i16 = properties.rssi.unwrap_or(0);
@@ -50,8 +50,6 @@ impl BleController for BtleplugController {
                 id: index,
                 company_id: company_code,
             });
-
-            index += 1;
         }
         self.scan_list = periph_vec;
         Ok(())
@@ -78,11 +76,7 @@ impl BleController for BtleplugController {
             if p.is_connected().await? {
                 for c in p.characteristics() {
                     if c.uuid.to_string() == characteristic {
-                        println!(
-                            "Writing {:?} to characteristic {}",
-                            payload,
-                            c.uuid.to_string()
-                        );
+                        println!("Writing {:?} to characteristic {}", payload, c.uuid);
                         char_found = true;
                         p.write(&c, payload, btleplug::api::WriteType::WithoutResponse)
                             .await?;
@@ -91,7 +85,7 @@ impl BleController for BtleplugController {
             }
         }
 
-        if char_found == false {
+        if !char_found {
             Err(format!("Characteristic: {} not found", characteristic))?
         }
 
@@ -106,7 +100,7 @@ impl BleController for BtleplugController {
                 for c in p.characteristics() {
                     if c.uuid.to_string() == characteristic {
                         char_found = true;
-                        println!("Reading Characteristic {} ...", c.uuid.to_string());
+                        println!("Reading Characteristic {} ...", c.uuid);
                         let content = p.read(&c).await?;
                         println!("{:?}", content);
                     }
@@ -114,7 +108,7 @@ impl BleController for BtleplugController {
             }
         }
 
-        if char_found == false {
+        if !char_found {
             Err(format!("Characteristic: {} not found", characteristic))?
         }
 
@@ -128,7 +122,9 @@ impl BleController for BtleplugController {
                 let properties = p.properties().await?.unwrap();
 
                 let mut infos = BlePeripheralInfo {
-                    periph_name: properties.local_name.unwrap_or(String::from("unknown")),
+                    periph_name: properties
+                        .local_name
+                        .unwrap_or_else(|| String::from("unknown")),
                     periph_mac: p.id().to_string(),
                     rssi: properties.rssi.unwrap_or(0),
                     services: Vec::new(),
@@ -183,10 +179,12 @@ impl BleController for BtleplugController {
     async fn connect(&mut self, uuid: &str) -> Result<(), Box<dyn Error>> {
         for p in &self.adapter.peripherals().await? {
             let properties = p.properties().await?.unwrap();
-            let name = properties.local_name.unwrap_or(String::from("unknown"));
+            let name = properties
+                .local_name
+                .unwrap_or_else(|| String::from("unknown"));
 
             if uuid == p.id().to_string() {
-                println!("Connecting to {} with uuid: {}", name, p.id().to_string());
+                println!("Connecting to {} with uuid: {}", name, p.id());
                 match p.connect().await {
                     Ok(()) => {
                         self.connected = true;
@@ -203,12 +201,10 @@ impl BleController for BtleplugController {
         for p in &self.adapter.peripherals().await? {
             if p.is_connected().await? {
                 let properties = p.properties().await?.unwrap();
-                let name = properties.local_name.unwrap_or(String::from("unknown"));
-                println!(
-                    "Disconnecting from {} with uuid: {} ... ",
-                    name,
-                    p.id().to_string()
-                );
+                let name = properties
+                    .local_name
+                    .unwrap_or_else(|| String::from("unknown"));
+                println!("Disconnecting from {} with uuid: {} ... ", name, p.id());
                 self.connected = false;
                 p.disconnect().await?;
                 break;
@@ -239,10 +235,8 @@ impl BtleplugController {
             1 => &adapter_list[0],
             _ => {
                 println!("Found multiple adapters, select the one to use:");
-                let mut index = 0;
-                for ad in &adapter_list {
+                for (index, ad) in adapter_list.iter().enumerate() {
                     println!("[{}]: {:?}", index, ad);
-                    index += 1;
                 }
                 let n = utils::get_usize_input(">>");
                 &adapter_list[n]

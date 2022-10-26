@@ -15,7 +15,7 @@ pub fn print_scan_list(list: &Vec<BlePeripheral>, show_all: bool) -> Result<(), 
     let mut empty_list: bool = true;
 
     for p in list {
-        if show_all == false && p.name == "unknown" {
+        if !show_all && p.name == "unknown" {
             continue;
         }
         table.add_row(vec![
@@ -23,7 +23,7 @@ pub fn print_scan_list(list: &Vec<BlePeripheral>, show_all: bool) -> Result<(), 
             &p.name,
             &p.address_uuid,
             &bluetooth_numbers::company_ids::get_company_name_from_id(p.company_id)
-                .unwrap_or("".to_owned()),
+                .unwrap_or_else(|| "".to_owned()),
             &p.rssi.to_string(),
         ]);
         empty_list = false

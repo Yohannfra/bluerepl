@@ -37,7 +37,7 @@ impl Repl<'_> {
             Ok(line) => {
                 self.editor.add_history_entry(line.as_str());
                 self.editor.save_history(HISTORY_FP).unwrap();
-                return line;
+                line
             }
             Err(ReadlineError::Interrupted) => {
                 println!("CTRL-C, bye");
@@ -94,7 +94,7 @@ impl Repl<'_> {
             Some(("info", mt)) => match mt.subcommand_name() {
                 Some("adapter") => commands::info::adapter(self.bt).await?,
                 Some("gatt") => {
-                    if self.bt.is_connected() == false {
+                    if !self.bt.is_connected() {
                         Err("You must be connected to a peripheral to run this command")?;
                     }
                     commands::info::gatt(self.bt).await?;
@@ -114,12 +114,12 @@ impl Repl<'_> {
                     commands::connect::by_index(self.bt, index).await?;
                 } else {
                     let identifier = mt.get_one::<String>("identifier").unwrap();
-                    commands::connect::auto_detect_identifier(self.bt, &identifier).await?;
+                    commands::connect::auto_detect_identifier(self.bt, identifier).await?;
                 }
             }
 
             Some(("disconnect", _mt)) => {
-                if self.bt.is_connected() == false {
+                if !self.bt.is_connected() {
                     Err("You must be connected to a peripheral to run this command")?;
                 } else {
                     commands::disconnect::run(self.bt).await?;
@@ -152,7 +152,7 @@ impl Repl<'_> {
                             self.preset
                                 .as_ref()
                                 .unwrap()
-                                .run_command(self.bt, &command_name)
+                                .run_command(self.bt, command_name)
                                 .await?;
                         }
                         Some(("function", arg)) => {
@@ -160,7 +160,7 @@ impl Repl<'_> {
                             self.preset
                                 .as_ref()
                                 .unwrap()
-                                .run_function(self.bt, &function_name)
+                                .run_function(self.bt, function_name)
                                 .await?;
                         }
                         _ => (),

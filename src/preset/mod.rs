@@ -8,7 +8,7 @@ use std::collections::HashMap;
 use std::error::Error;
 
 use std::{fs, path};
-use toml;
+
 
 use std::time::Duration;
 use tokio::time;
@@ -94,7 +94,7 @@ impl Preset {
             // check services
             for cmd in self.commands.as_ref().unwrap() {
                 if self.services.is_none()
-                    || self.services.as_ref().unwrap().contains_key(&cmd.1.service) == false
+                    || !self.services.as_ref().unwrap().contains_key(&cmd.1.service)
                 {
                     panic!(
                         "Service '{}' in command '{}' not found",
@@ -104,35 +104,24 @@ impl Preset {
 
                 // check characteristics
                 for ser in self.services.as_ref().unwrap() {
-                    if cmd.1.service == *ser.0 {
-                        if ser.1.characteristics.is_none()
-                            || ser
+                    if cmd.1.service == *ser.0 && (ser.1.characteristics.is_none() || !ser
                                 .1
                                 .characteristics
                                 .as_ref()
                                 .unwrap()
-                                .contains_key(&cmd.1.characteristic)
-                                == false
-                        {
-                            panic!(
-                                "Characteristic '{}' in command '{}' not found",
-                                cmd.1.characteristic, cmd.0
-                            );
-                        }
+                                .contains_key(&cmd.1.characteristic)) {
+                        panic!(
+                            "Characteristic '{}' in command '{}' not found",
+                            cmd.1.characteristic, cmd.0
+                        );
                     }
                 }
             }
         }
 
         // check that if autoconnect=true there is also device name or address
-        if self.device.is_some() {
-            if self.device.as_ref().unwrap().autoconnect.unwrap_or(false) {
-                if self.device.as_ref().unwrap().name.is_none()
-                    && self.device.as_ref().unwrap().address.is_none()
-                {
-                    panic!("You must provide a name or an address to use the autoconnect feature");
-                }
-            }
+        if self.device.is_some() && self.device.as_ref().unwrap().autoconnect.unwrap_or(false) && self.device.as_ref().unwrap().name.is_none() && self.device.as_ref().unwrap().address.is_none() {
+            panic!("You must provide a name or an address to use the autoconnect feature");
         }
 
         // check that the function commands array is the same length as the function delay array
@@ -314,12 +303,12 @@ impl Preset {
     ) -> Result<(), Box<dyn Error>> {
         commands::scan::run(bt, 5, false, false).await.unwrap();
         if self.device.as_ref().unwrap().name.is_some() {
-            commands::connect::by_name(bt, &self.device.as_ref().unwrap().name.as_ref().unwrap())
+            commands::connect::by_name(bt, self.device.as_ref().unwrap().name.as_ref().unwrap())
                 .await?;
         } else {
             commands::connect::by_address(
                 bt,
-                &self.device.as_ref().unwrap().address.as_ref().unwrap(),
+                self.device.as_ref().unwrap().address.as_ref().unwrap(),
             )
             .await?;
         }

@@ -1,7 +1,7 @@
 use super::compare_uuid::compare_uuid;
 use serde::{Deserialize, Serialize};
 
-static SERVICES_UUIDS_JSON_STR: &'static str = include_str!("service_uuids.json");
+static SERVICES_UUIDS_JSON_STR: &str = include_str!("service_uuids.json");
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Services {
@@ -21,7 +21,7 @@ pub fn get_service_name_from_uuid(uuid: &str) -> Option<String> {
             return Some(s.name.clone());
         }
     }
-    return None;
+    None
 }
 
 pub fn get_service_identifier_from_uuid(uuid: &str) -> Option<String> {
@@ -30,7 +30,7 @@ pub fn get_service_identifier_from_uuid(uuid: &str) -> Option<String> {
             return Some(s.identifier.clone());
         }
     }
-    return None;
+    None
 }
 
 #[cfg(test)]
