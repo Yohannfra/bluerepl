@@ -177,7 +177,7 @@ impl Repl<'_> {
 
     pub async fn start(&mut self) -> ! {
         if self.editor.load_history(HISTORY_FP).is_err() {
-            eprintln!("No previous history.");
+            println!("No previous history.");
         }
 
         if let Some(preset) = &self.preset {
