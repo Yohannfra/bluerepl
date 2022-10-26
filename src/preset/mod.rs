@@ -220,7 +220,7 @@ impl Preset {
 
     pub async fn run_command(
         &self,
-        bt: &mut Box<dyn controllers::BleController>,
+        bt: &mut dyn controllers::BleController,
         command_name: &str,
     ) -> Result<(), Box<dyn Error>> {
         // check if there are no commands in preset
@@ -276,7 +276,7 @@ impl Preset {
 
     pub async fn run_function(
         &self,
-        bt: &mut Box<dyn controllers::BleController>,
+        bt: &mut dyn controllers::BleController,
         function_name: &str,
     ) -> Result<(), Box<dyn Error>> {
         // check if there are no function in preset
@@ -310,7 +310,7 @@ impl Preset {
 
     pub async fn autoconnect(
         &self,
-        bt: &mut Box<dyn controllers::BleController>,
+        bt: &mut dyn controllers::BleController,
     ) -> Result<(), Box<dyn Error>> {
         commands::scan::run(bt, 5, false, false).await.unwrap();
         if self.device.as_ref().unwrap().name.is_some() {
@@ -342,13 +342,8 @@ mod tests {
         ];
 
         for fp in test_files {
-            match Preset::new(path::PathBuf::from(fp)) {
-                Ok(_) => {}
-                Err(e) => {
-                    eprintln!("{}", e);
-                    assert!(false)
-                }
-            }
+            let preset = Preset::new(path::PathBuf::from(fp));
+            assert!(preset.is_err(), "{:?}", preset);
         }
     }
 }

@@ -8,19 +8,18 @@ pub mod commands;
 use crate::controllers;
 use crate::preset::Preset;
 use controllers::BleController;
-
 use std::error::Error;
 
-pub struct Repl {
-    bt: Box<dyn BleController>,
+pub struct Repl<'a> {
+    bt: &'a mut dyn BleController,
     editor: Editor<()>,
     preset: Option<Preset>,
 }
 
 const HISTORY_FP: &str = ".history.txt";
 
-impl Repl {
-    pub fn new(bt: Box<dyn controllers::BleController>) -> Repl {
+impl Repl<'_> {
+    pub async fn new(bt: &mut dyn BleController) -> Repl {
         Repl {
             bt,
             editor: Editor::<()>::new().unwrap(),
@@ -70,14 +69,14 @@ impl Repl {
                 let characteristic = mt.get_one::<String>("characteristic").unwrap();
                 let payload = mt.get_one::<String>("payload").unwrap();
 
-                commands::write::write(&mut self.bt, service, characteristic, payload).await?;
+                commands::write::write(self.bt, service, characteristic, payload).await?;
             }
 
             Some(("read", mt)) => {
                 let service = mt.get_one::<String>("service").unwrap();
                 let characteristic = mt.get_one::<String>("characteristic").unwrap();
 
-                commands::read::read(&mut self.bt, service, characteristic).await?;
+                commands::read::read(self.bt, service, characteristic).await?;
             }
 
             Some(("scan", mt)) => {
@@ -89,16 +88,16 @@ impl Repl {
 
                 let timeout = *mt.get_one::<usize>("timeout").unwrap();
 
-                commands::scan::run(&mut self.bt, timeout, true, show_all).await?;
+                commands::scan::run(self.bt, timeout, true, show_all).await?;
             }
 
             Some(("info", mt)) => match mt.subcommand_name() {
-                Some("adapter") => commands::info::adapter(&mut self.bt).await?,
+                Some("adapter") => commands::info::adapter(self.bt).await?,
                 Some("gatt") => {
                     if self.bt.is_connected() == false {
                         Err("You must be connected to a peripheral to run this command")?;
                     }
-                    commands::info::gatt(&mut self.bt).await?;
+                    commands::info::gatt(self.bt).await?;
                 }
                 _ => panic!("Code should never be here"),
             },
@@ -106,16 +105,16 @@ impl Repl {
             Some(("connect", mt)) => {
                 if mt.contains_id("name") {
                     let name = mt.get_one::<String>("name").unwrap();
-                    commands::connect::by_name(&mut self.bt, name).await?;
+                    commands::connect::by_name(self.bt, name).await?;
                 } else if mt.contains_id("mac") {
                     let addr = mt.get_one::<String>("mac").unwrap();
-                    commands::connect::by_address(&mut self.bt, addr).await?;
+                    commands::connect::by_address(self.bt, addr).await?;
                 } else if mt.contains_id("id") {
                     let index = *mt.get_one::<usize>("id").unwrap();
-                    commands::connect::by_index(&mut self.bt, index).await?;
+                    commands::connect::by_index(self.bt, index).await?;
                 } else {
                     let identifier = mt.get_one::<String>("identifier").unwrap();
-                    commands::connect::auto_detect_identifier(&mut self.bt, &identifier).await?;
+                    commands::connect::auto_detect_identifier(self.bt, &identifier).await?;
                 }
             }
 
@@ -123,7 +122,7 @@ impl Repl {
                 if self.bt.is_connected() == false {
                     Err("You must be connected to a peripheral to run this command")?;
                 } else {
-                    commands::disconnect::run(&mut self.bt).await?;
+                    commands::disconnect::run(self.bt).await?;
                 }
             }
 
@@ -153,7 +152,7 @@ impl Repl {
                             self.preset
                                 .as_ref()
                                 .unwrap()
-                                .run_command(&mut self.bt, &command_name)
+                                .run_command(self.bt, &command_name)
                                 .await?;
                         }
                         Some(("function", arg)) => {
@@ -161,7 +160,7 @@ impl Repl {
                             self.preset
                                 .as_ref()
                                 .unwrap()
-                                .run_function(&mut self.bt, &function_name)
+                                .run_function(self.bt, &function_name)
                                 .await?;
                         }
                         _ => (),
@@ -178,16 +177,16 @@ impl Repl {
 
     pub async fn start(&mut self) -> ! {
         if self.editor.load_history(HISTORY_FP).is_err() {
-            println!("No previous history.");
+            eprintln!("No previous history.");
         }
 
-        if self.preset.is_some() {
-            if self.preset.as_ref().unwrap().should_autoconnect() {
+        if let Some(preset) = &self.preset {
+            if preset.should_autoconnect() {
                 println!("autoconnect found in preset, running auto connection");
                 self.preset
                     .as_ref()
                     .unwrap()
-                    .autoconnect(&mut self.bt)
+                    .autoconnect(self.bt)
                     .await
                     .unwrap();
             }

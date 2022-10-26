@@ -49,14 +49,14 @@ fn print_gatt_infos(infos: &BlePeripheralInfo) {
     println!("{table}");
 }
 
-pub async fn gatt(bt: &mut Box<dyn controllers::BleController>) -> Result<(), Box<dyn Error>> {
+pub async fn gatt(bt: &mut dyn controllers::BleController) -> Result<(), Box<dyn Error>> {
     let infos: BlePeripheralInfo = bt.get_peripheral_infos().await?;
     print_gatt_infos(&infos);
 
     Ok(())
 }
 
-pub async fn adapter(bt: &mut Box<dyn controllers::BleController>) -> Result<(), Box<dyn Error>> {
+pub async fn adapter(bt: &mut dyn controllers::BleController) -> Result<(), Box<dyn Error>> {
     let infos = bt.get_adapter_infos().await?;
     println!("{}", infos);
 

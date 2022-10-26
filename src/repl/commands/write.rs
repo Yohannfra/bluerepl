@@ -4,7 +4,7 @@ use std::error::Error;
 use str_to_bytes::str_to_bytes;
 
 pub async fn write(
-    bt: &mut Box<dyn controllers::BleController>,
+    bt: &mut dyn controllers::BleController,
     service: &str,
     characteristic: &str,
     payload: &str,

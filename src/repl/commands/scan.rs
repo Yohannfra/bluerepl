@@ -39,7 +39,7 @@ pub fn print_scan_list(list: &Vec<BlePeripheral>, show_all: bool) -> Result<(), 
 }
 
 pub async fn run(
-    bt: &mut Box<dyn controllers::BleController>,
+    bt: &mut dyn controllers::BleController,
     timeout: usize,
     print_results: bool,
     show_all: bool,
