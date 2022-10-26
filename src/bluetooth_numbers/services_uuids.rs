@@ -38,17 +38,33 @@ mod tests {
 
     #[test]
     fn test_get_service_name_from_uuid() {
-        assert_eq!(get_service_name_from_uuid("180F"), Some("Battery Service".to_owned()));
-        assert_eq!(get_service_name_from_uuid("180D"), Some("Heart Rate".to_owned()));
-        assert_eq!(get_service_name_from_uuid("ADAF0E00-C332-42A8-93BD-25E905756CB8"), Some("Adafruit Proximity Service".to_owned()));
-
+        assert_eq!(
+            get_service_name_from_uuid("180F"),
+            Some("Battery Service".to_owned())
+        );
+        assert_eq!(
+            get_service_name_from_uuid("180D"),
+            Some("Heart Rate".to_owned())
+        );
+        assert_eq!(
+            get_service_name_from_uuid("ADAF0E00-C332-42A8-93BD-25E905756CB8"),
+            Some("Adafruit Proximity Service".to_owned())
+        );
     }
 
     #[test]
     fn test_get_service_identifier_from_uuid() {
-        assert_eq!(get_service_identifier_from_uuid("180F"), Some("org.bluetooth.service.battery_service".to_owned()));
-        assert_eq!(get_service_identifier_from_uuid("180D"), Some("org.bluetooth.service.heart_rate".to_owned()));
-        assert_eq!(get_service_identifier_from_uuid("ADAF0E00-C332-42A8-93BD-25E905756CB8"), Some("com.adafruit.service.proximity".to_owned()));
-
+        assert_eq!(
+            get_service_identifier_from_uuid("180F"),
+            Some("org.bluetooth.service.battery_service".to_owned())
+        );
+        assert_eq!(
+            get_service_identifier_from_uuid("180D"),
+            Some("org.bluetooth.service.heart_rate".to_owned())
+        );
+        assert_eq!(
+            get_service_identifier_from_uuid("ADAF0E00-C332-42A8-93BD-25E905756CB8"),
+            Some("com.adafruit.service.proximity".to_owned())
+        );
     }
 }

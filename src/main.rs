@@ -3,11 +3,11 @@ extern crate exitcode;
 #[macro_use]
 extern crate lazy_static;
 
+mod bluetooth_numbers;
 mod controllers;
 mod preset;
 mod repl;
 mod utils;
-mod bluetooth_numbers;
 
 use clap::Parser;
 use controllers::btleplug;

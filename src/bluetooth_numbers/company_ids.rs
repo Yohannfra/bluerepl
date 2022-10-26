@@ -32,8 +32,14 @@ mod tests {
 
     #[test]
     fn test_get_company_name_from_id() {
-        assert_eq!(get_company_name_from_id(0), Some("Ericsson Technology Licensing".to_owned()));
-        assert_eq!(get_company_name_from_id(89), Some("Nordic Semiconductor ASA".to_owned()));
+        assert_eq!(
+            get_company_name_from_id(0),
+            Some("Ericsson Technology Licensing".to_owned())
+        );
+        assert_eq!(
+            get_company_name_from_id(89),
+            Some("Nordic Semiconductor ASA".to_owned())
+        );
         assert_eq!(get_company_name_from_id(2087), Some("Kickmaker".to_owned()));
         assert_eq!(get_company_name_from_id(65535), Some("Bluetooth SIG Specification Reserved Default Vendor ID for Remote Devices Without Device ID Service Record.".to_owned()));
         assert_eq!(get_company_name_from_id(4124), None);

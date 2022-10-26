@@ -11,7 +11,8 @@ struct Services {
 }
 
 lazy_static! {
-    static ref PARSED_JSON: Vec<Services> = serde_json::from_str(DESCRIPTOR_UUIDS_JSON_STR).unwrap();
+    static ref PARSED_JSON: Vec<Services> =
+        serde_json::from_str(DESCRIPTOR_UUIDS_JSON_STR).unwrap();
 }
 
 pub fn get_descriptor_name_from_uuid(uuid: &str) -> Option<String> {
@@ -38,15 +39,25 @@ mod tests {
 
     #[test]
     fn test_get_descriptor_name_from_uuid() {
-        assert_eq!(get_descriptor_name_from_uuid("2906"), Some("Valid Range".to_owned()));
-        assert_eq!(get_descriptor_name_from_uuid("290F"), Some("Complete BR-EDR Transport Block Data".to_owned()));
-
+        assert_eq!(
+            get_descriptor_name_from_uuid("2906"),
+            Some("Valid Range".to_owned())
+        );
+        assert_eq!(
+            get_descriptor_name_from_uuid("290F"),
+            Some("Complete BR-EDR Transport Block Data".to_owned())
+        );
     }
 
     #[test]
     fn test_get_descriptor_identifier_from_uuid() {
-        assert_eq!(get_descriptor_identifier_from_uuid("2906"), Some("org.bluetooth.descriptor.valid_range".to_owned()));
-        assert_eq!(get_descriptor_identifier_from_uuid("290F"), Some("org.bluetooth.descriptor.complete_bredr_transport_block_data".to_owned()));
-
+        assert_eq!(
+            get_descriptor_identifier_from_uuid("2906"),
+            Some("org.bluetooth.descriptor.valid_range".to_owned())
+        );
+        assert_eq!(
+            get_descriptor_identifier_from_uuid("290F"),
+            Some("org.bluetooth.descriptor.complete_bredr_transport_block_data".to_owned())
+        );
     }
 }
