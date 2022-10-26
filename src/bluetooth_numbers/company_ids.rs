@@ -8,11 +8,6 @@ struct Company {
     name: String,
 }
 
-// #[derive(Serialize, Deserialize, Debug)]
-// struct CompanyList {
-//     list: Vec<Company>
-// }
-
 lazy_static! {
     static ref PARSED_JSON: Vec<Company> = serde_json::from_str(COMPANY_ID_JSON_STR).unwrap();
 }
