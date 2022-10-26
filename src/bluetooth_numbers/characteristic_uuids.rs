@@ -1,3 +1,4 @@
+use super::compare_uuid::compare_uuid;
 use serde::{Deserialize, Serialize};
 
 static CHARACTERISTICS_UUIDS_JSON_STR: &'static str = include_str!("characteristic_uuids.json");
@@ -17,7 +18,7 @@ lazy_static! {
 
 pub fn get_characteristic_name_from_uuid(uuid: &str) -> Option<String> {
     for s in PARSED_JSON.iter() {
-        if s.uuid.to_uppercase() == uuid.to_uppercase() {
+        if compare_uuid(&uuid.to_uppercase(), &s.uuid.to_uppercase()) {
             return Some(s.name.clone());
         }
     }
@@ -26,7 +27,7 @@ pub fn get_characteristic_name_from_uuid(uuid: &str) -> Option<String> {
 
 pub fn get_characteristic_identifier_from_uuid(uuid: &str) -> Option<String> {
     for s in PARSED_JSON.iter() {
-        if s.uuid.to_uppercase() == uuid.to_uppercase() {
+        if compare_uuid(&uuid.to_uppercase(), &s.uuid.to_uppercase()) {
             return Some(s.identifier.clone());
         }
     }
