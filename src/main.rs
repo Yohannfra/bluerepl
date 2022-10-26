@@ -42,16 +42,15 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let mut bt = match args.ble_lib.as_str() {
         "btleplug" => btleplug::BtleplugController::new().await,
-        "simpleble" => todo!("simpleble is not yet implemented"),
-        // "bleuio" => Box::new(simpleble::BleuIOController::new()),
+        "simpleble" => todo!("simpleble support is not yet implemented"),
+        "bleuio" => todo!("bleuio support is not yet implemented"),
         n => panic!("Unknown controller id {}", n),
     };
 
     let mut repl = Repl::new(&mut bt).await;
 
     if args.preset_file != None {
-        let mut pr =
-            Preset::new(args.preset_file.unwrap()).expect("this is suposed to work but...");
+        let mut pr = Preset::new(args.preset_file.unwrap()).unwrap();
 
         if args.autoconnect {
             pr.device.as_mut().unwrap().autoconnect = Some(true);

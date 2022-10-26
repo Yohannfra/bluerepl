@@ -9,7 +9,6 @@ use std::error::Error;
 
 use std::{fs, path};
 
-
 use std::time::Duration;
 use tokio::time;
 
@@ -104,12 +103,15 @@ impl Preset {
 
                 // check characteristics
                 for ser in self.services.as_ref().unwrap() {
-                    if cmd.1.service == *ser.0 && (ser.1.characteristics.is_none() || !ser
+                    if cmd.1.service == *ser.0
+                        && (ser.1.characteristics.is_none()
+                            || !ser
                                 .1
                                 .characteristics
                                 .as_ref()
                                 .unwrap()
-                                .contains_key(&cmd.1.characteristic)) {
+                                .contains_key(&cmd.1.characteristic))
+                    {
                         panic!(
                             "Characteristic '{}' in command '{}' not found",
                             cmd.1.characteristic, cmd.0
@@ -120,7 +122,11 @@ impl Preset {
         }
 
         // check that if autoconnect=true there is also device name or address
-        if self.device.is_some() && self.device.as_ref().unwrap().autoconnect.unwrap_or(false) && self.device.as_ref().unwrap().name.is_none() && self.device.as_ref().unwrap().address.is_none() {
+        if self.device.is_some()
+            && self.device.as_ref().unwrap().autoconnect.unwrap_or(false)
+            && self.device.as_ref().unwrap().name.is_none()
+            && self.device.as_ref().unwrap().address.is_none()
+        {
             panic!("You must provide a name or an address to use the autoconnect feature");
         }
 
@@ -332,7 +338,7 @@ mod tests {
 
         for fp in test_files {
             let preset = Preset::new(path::PathBuf::from(fp));
-            assert!(preset.is_err(), "{:?}", preset);
+            assert!(preset.is_ok(), "{:?}", preset);
         }
     }
 }
