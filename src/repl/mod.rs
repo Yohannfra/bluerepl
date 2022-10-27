@@ -134,7 +134,7 @@ impl Repl<'_> {
                 let service = mt.get_one::<String>("service").unwrap();
                 let characteristic = mt.get_one::<String>("characteristic").unwrap();
 
-                commands::notify::notify(&mut self.bt, service, characteristic).await?;
+                commands::notify::notify(self.bt, service, characteristic).await?;
             }
 
             Some(("unsubscribe", mt)) => {

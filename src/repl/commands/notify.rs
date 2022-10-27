@@ -2,7 +2,7 @@ use crate::controllers;
 use std::error::Error;
 
 pub async fn notify(
-    bt: &mut Box<dyn controllers::BleController>,
+    bt: &mut dyn controllers::BleController,
     service: &str,
     characteristic: &str,
 ) -> Result<(), Box<dyn Error>> {
