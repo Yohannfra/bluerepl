@@ -74,6 +74,7 @@ impl BleController for BtleplugController {
 
         for p in &self.adapter.peripherals().await? {
             if p.is_connected().await? {
+                p.discover_services().await.unwrap();
                 for c in p.characteristics() {
                     if c.uuid.to_string() == characteristic {
                         println!("Writing {:?} to characteristic {}", payload, c.uuid);
@@ -97,6 +98,7 @@ impl BleController for BtleplugController {
 
         for p in &self.adapter.peripherals().await? {
             if p.is_connected().await? {
+                p.discover_services().await.unwrap();
                 for c in p.characteristics() {
                     if c.uuid.to_string() == characteristic {
                         char_found = true;
@@ -118,6 +120,9 @@ impl BleController for BtleplugController {
     async fn get_peripheral_infos(&self) -> Result<BlePeripheralInfo, Box<dyn Error>> {
         for p in &self.adapter.peripherals().await? {
             if p.is_connected().await? {
+
+                p.discover_services().await.unwrap();
+
                 let services = p.services();
                 let properties = p.properties().await?.unwrap();
 
