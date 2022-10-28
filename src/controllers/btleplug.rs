@@ -43,7 +43,7 @@ impl BleController for BtleplugController {
                 company_code = *code as usize;
             }
 
-            let rssi: i16 = properties.rssi.unwrap_or_else(||0);
+            let rssi: i16 = properties.rssi.unwrap_or_else(|| 0);
 
             periph_vec.push(BlePeripheral {
                 name,
@@ -129,7 +129,7 @@ impl BleController for BtleplugController {
                     .local_name
                     .unwrap_or_else(|| String::from("unknown")),
                 periph_mac: self.get_address_or_uuid(&p).await?,
-                rssi: properties.rssi.unwrap_or_else(||0),
+                rssi: properties.rssi.unwrap_or_else(|| 0),
                 services: Vec::new(),
             };
 
@@ -192,13 +192,9 @@ impl BleController for BtleplugController {
                     name,
                     self.get_address_or_uuid(&p).await?
                 );
-                match p.connect().await {
-                    Ok(()) => {
-                        self.peripheral = Some(Box::new(p.clone()));
-                        return Ok(());
-                    }
-                    Err(e) => return Err(format!("{}", e))?,
-                }
+                p.connect().await?;
+
+                self.peripheral = Some(Box::new(p.clone()));
             }
         }
         Err(format!("Peripheral with uuid {} not found", uuid))?
