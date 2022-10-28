@@ -14,9 +14,9 @@ use btleplug::api::{Central, Manager as _, Peripheral, ScanFilter};
 use btleplug::platform::{Adapter, Manager};
 
 pub struct BtleplugController {
-    connected: bool,
     adapter: Adapter,
     scan_list: Vec<BlePeripheral>,
+    peripheral: Option<Box<btleplug::platform::Peripheral>>,
 }
 
 #[async_trait]
@@ -70,114 +70,111 @@ impl BleController for BtleplugController {
         characteristic: &str,
         payload: &[u8],
     ) -> Result<(), Box<dyn Error>> {
-        let mut char_found = false;
+        if let Some(p) = &self.peripheral {
+            p.discover_services().await.unwrap();
 
-        for p in &self.adapter.peripherals().await? {
-            if p.is_connected().await? {
-                p.discover_services().await.unwrap();
-                for c in p.characteristics() {
-                    if c.uuid.to_string() == characteristic {
-                        println!("Writing {:?} to characteristic {}", payload, c.uuid);
-                        char_found = true;
-                        p.write(&c, payload, btleplug::api::WriteType::WithoutResponse)
-                            .await?;
-                    }
-                }
+            let c = p
+                .characteristics()
+                .into_iter()
+                .find(|c| c.uuid.to_string() == characteristic);
+
+            if let Some(c) = c {
+                println!("Writing {:?} to characteristic {}", payload, c.uuid);
+                p.write(&c, payload, btleplug::api::WriteType::WithoutResponse)
+                    .await?;
+            } else {
+                Err(format!("Characteristic: {} not found", characteristic))?
             }
-        }
-
-        if !char_found {
-            Err(format!("Characteristic: {} not found", characteristic))?
+        } else {
+            Err("You must be connected to write")?
         }
 
         Ok(())
     }
 
     async fn read(&mut self, _service: &str, characteristic: &str) -> Result<(), Box<dyn Error>> {
-        let mut char_found = false;
+        if let Some(p) = &self.peripheral {
+            p.discover_services().await.unwrap();
 
-        for p in &self.adapter.peripherals().await? {
-            if p.is_connected().await? {
-                p.discover_services().await.unwrap();
-                for c in p.characteristics() {
-                    if c.uuid.to_string() == characteristic {
-                        char_found = true;
-                        println!("Reading Characteristic {} ...", c.uuid);
-                        let content = p.read(&c).await?;
-                        println!("{:?}", content);
-                    }
-                }
+            let c = p
+                .characteristics()
+                .into_iter()
+                .find(|c| c.uuid.to_string() == characteristic);
+
+            if let Some(c) = c {
+                println!("Reading Characteristic {} ...", c.uuid);
+                let content = p.read(&c).await?;
+                println!("{:?}", content);
+            } else {
+                Err(format!("Characteristic: {} not found", characteristic))?
             }
-        }
-
-        if !char_found {
-            Err(format!("Characteristic: {} not found", characteristic))?
+        } else {
+            Err("You must be connected to read")?
         }
 
         Ok(())
     }
 
     async fn get_peripheral_infos(&self) -> Result<BlePeripheralInfo, Box<dyn Error>> {
-        for p in &self.adapter.peripherals().await? {
-            if p.is_connected().await? {
-                p.discover_services().await.unwrap();
+        if let Some(p) = &self.peripheral {
+            p.discover_services().await.unwrap();
 
-                let services = p.services();
-                let properties = p.properties().await?.unwrap();
+            let services = p.services();
+            let properties = p.properties().await?.unwrap();
 
-                let mut infos = BlePeripheralInfo {
-                    periph_name: properties
-                        .local_name
-                        .unwrap_or_else(|| String::from("unknown")),
-                    periph_mac: self.get_address_or_uuid(&p).await?,
-                    rssi: properties.rssi.unwrap_or(0),
-                    services: Vec::new(),
+            let mut infos = BlePeripheralInfo {
+                periph_name: properties
+                    .local_name
+                    .unwrap_or_else(|| String::from("unknown")),
+                periph_mac: self.get_address_or_uuid(&p).await?,
+                rssi: properties.rssi.unwrap_or(0),
+                services: Vec::new(),
+            };
+
+            for s in services {
+                let mut ser = Service {
+                    uuid: s.uuid.to_string(),
+                    characteriscics: Vec::new(),
                 };
 
-                for s in services {
-                    let mut ser = Service {
-                        uuid: s.uuid.to_string(),
-                        characteriscics: Vec::new(),
+                for c in s.characteristics {
+                    let mut car = Characteristic {
+                        uuid: c.uuid.to_string(),
+                        properties: CharacteristicProperties::UNKNOWN,
                     };
 
-                    for c in s.characteristics {
-                        let mut car = Characteristic {
-                            uuid: c.uuid.to_string(),
-                            properties: CharacteristicProperties::UNKNOWN,
-                        };
-
-                        if c.properties.contains(btleplug::api::CharPropFlags::WRITE) {
-                            car.properties |= CharacteristicProperties::WRITE;
-                        }
-
-                        if c.properties.contains(btleplug::api::CharPropFlags::READ) {
-                            car.properties |= CharacteristicProperties::READ;
-                        }
-
-                        if c.properties
-                            .contains(btleplug::api::CharPropFlags::WRITE_WITHOUT_RESPONSE)
-                        {
-                            car.properties |= CharacteristicProperties::WRITE_WITHOUT_RESPONSE;
-                        }
-
-                        if c.properties.contains(btleplug::api::CharPropFlags::NOTIFY) {
-                            car.properties |= CharacteristicProperties::NOTIFY;
-                        }
-
-                        if c.properties
-                            .contains(btleplug::api::CharPropFlags::INDICATE)
-                        {
-                            car.properties |= CharacteristicProperties::INDICATE;
-                        }
-
-                        ser.characteriscics.push(car);
+                    if c.properties.contains(btleplug::api::CharPropFlags::WRITE) {
+                        car.properties |= CharacteristicProperties::WRITE;
                     }
-                    infos.services.push(ser);
+
+                    if c.properties.contains(btleplug::api::CharPropFlags::READ) {
+                        car.properties |= CharacteristicProperties::READ;
+                    }
+
+                    if c.properties
+                        .contains(btleplug::api::CharPropFlags::WRITE_WITHOUT_RESPONSE)
+                    {
+                        car.properties |= CharacteristicProperties::WRITE_WITHOUT_RESPONSE;
+                    }
+
+                    if c.properties.contains(btleplug::api::CharPropFlags::NOTIFY) {
+                        car.properties |= CharacteristicProperties::NOTIFY;
+                    }
+
+                    if c.properties
+                        .contains(btleplug::api::CharPropFlags::INDICATE)
+                    {
+                        car.properties |= CharacteristicProperties::INDICATE;
+                    }
+
+                    ser.characteriscics.push(car);
                 }
-                return Ok(infos);
+                infos.services.push(ser);
             }
+            return Ok(infos);
+        } else {
+            Err("You must be connected to get peripheral infos")?
         }
-        panic!("Code should not arrive here");
     }
 
     async fn connect(&mut self, uuid: &str) -> Result<(), Box<dyn Error>> {
@@ -195,7 +192,7 @@ impl BleController for BtleplugController {
                 );
                 match p.connect().await {
                     Ok(()) => {
-                        self.connected = true;
+                        self.peripheral = Some(Box::new(p.clone()));
                         return Ok(());
                     }
                     Err(e) => return Err(format!("{}", e))?,
@@ -206,27 +203,26 @@ impl BleController for BtleplugController {
     }
 
     async fn disconnect(&mut self) -> Result<(), Box<dyn Error>> {
-        for p in &self.adapter.peripherals().await? {
-            if p.is_connected().await? {
-                let properties = p.properties().await?.unwrap();
-                let name = properties
-                    .local_name
-                    .unwrap_or_else(|| String::from("unknown"));
-                println!(
-                    "Disconnecting from {} with uuid: {} ... ",
-                    name,
-                    self.get_address_or_uuid(&p).await?
-                );
-                self.connected = false;
-                p.disconnect().await?;
-                break;
-            }
+        if let Some(p) = &self.peripheral {
+            let properties = p.properties().await?.unwrap();
+            let name = properties
+                .local_name
+                .unwrap_or_else(|| String::from("unknown"));
+            println!(
+                "Disconnecting from {} with uuid: {} ... ",
+                name,
+                self.get_address_or_uuid(p).await?
+            );
+            p.disconnect().await?;
+        } else {
+            Err("You must be connected to disconnect")?
         }
+        self.peripheral = None;
         Ok(())
     }
 
     fn is_connected(&self) -> bool {
-        self.connected
+        self.peripheral.is_some()
     }
 }
 
@@ -261,9 +257,9 @@ impl BtleplugController {
         );
 
         BtleplugController {
-            connected: false,
             adapter: adapter.clone(),
             scan_list: Vec::new(),
+            peripheral: None,
         }
     }
 
