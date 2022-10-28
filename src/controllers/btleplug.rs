@@ -24,9 +24,11 @@ impl BleController for BtleplugController {
     async fn scan(&mut self, scan_time_s: usize) -> Result<(), Box<dyn Error>> {
         println!("Scanning for {} seconds...", scan_time_s);
 
+        // stop previous scan, return values doesn't matter
+        let _ = self.adapter.stop_scan().await;
+
         self.adapter.start_scan(ScanFilter::default()).await?; // start scan
         time::sleep(Duration::from_secs(scan_time_s as u64)).await; // wait x seconds
-        self.adapter.stop_scan().await?; // stop scan
 
         let peripherals = self.adapter.peripherals().await?;
         let mut periph_vec: Vec<BlePeripheral> = Vec::new();
@@ -41,7 +43,7 @@ impl BleController for BtleplugController {
                 company_code = *code as usize;
             }
 
-            let rssi: i16 = properties.rssi.unwrap_or(0);
+            let rssi: i16 = properties.rssi.unwrap_or_else(||0);
 
             periph_vec.push(BlePeripheral {
                 name,
@@ -127,7 +129,7 @@ impl BleController for BtleplugController {
                     .local_name
                     .unwrap_or_else(|| String::from("unknown")),
                 periph_mac: self.get_address_or_uuid(&p).await?,
-                rssi: properties.rssi.unwrap_or(0),
+                rssi: properties.rssi.unwrap_or_else(||0),
                 services: Vec::new(),
             };
 
