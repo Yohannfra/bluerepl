@@ -195,6 +195,7 @@ impl BleController for BtleplugController {
                 p.connect().await?;
 
                 self.peripheral = Some(Box::new(p.clone()));
+                return Ok(())
             }
         }
         Err(format!("Peripheral with uuid {} not found", uuid))?
