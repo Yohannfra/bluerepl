@@ -45,7 +45,7 @@ impl BleController for BtleplugController {
 
             periph_vec.push(BlePeripheral {
                 name,
-                address_uuid: p.id().to_string(),
+                address_uuid: self.get_address_or_uuid(&p).await?,
                 rssi,
                 id: index,
                 company_id: company_code,
@@ -120,7 +120,6 @@ impl BleController for BtleplugController {
     async fn get_peripheral_infos(&self) -> Result<BlePeripheralInfo, Box<dyn Error>> {
         for p in &self.adapter.peripherals().await? {
             if p.is_connected().await? {
-
                 p.discover_services().await.unwrap();
 
                 let services = p.services();
@@ -130,7 +129,7 @@ impl BleController for BtleplugController {
                     periph_name: properties
                         .local_name
                         .unwrap_or_else(|| String::from("unknown")),
-                    periph_mac: p.id().to_string(),
+                    periph_mac: self.get_address_or_uuid(&p).await?,
                     rssi: properties.rssi.unwrap_or(0),
                     services: Vec::new(),
                 };
@@ -188,8 +187,12 @@ impl BleController for BtleplugController {
                 .local_name
                 .unwrap_or_else(|| String::from("unknown"));
 
-            if uuid == p.id().to_string() {
-                println!("Connecting to {} with uuid: {}", name, p.id());
+            if uuid == self.get_address_or_uuid(&p).await? {
+                println!(
+                    "Connecting to {} with uuid: {}",
+                    name,
+                    self.get_address_or_uuid(&p).await?
+                );
                 match p.connect().await {
                     Ok(()) => {
                         self.connected = true;
@@ -209,7 +212,11 @@ impl BleController for BtleplugController {
                 let name = properties
                     .local_name
                     .unwrap_or_else(|| String::from("unknown"));
-                println!("Disconnecting from {} with uuid: {} ... ", name, p.id());
+                println!(
+                    "Disconnecting from {} with uuid: {} ... ",
+                    name,
+                    self.get_address_or_uuid(&p).await?
+                );
                 self.connected = false;
                 p.disconnect().await?;
                 break;
@@ -257,6 +264,19 @@ impl BtleplugController {
             connected: false,
             adapter: adapter.clone(),
             scan_list: Vec::new(),
+        }
+    }
+
+    async fn get_address_or_uuid(
+        &self,
+        p: &btleplug::platform::Peripheral,
+    ) -> Result<String, Box<dyn Error>> {
+        let properties = p.properties().await?.unwrap();
+
+        if cfg!(target_os = "macos") {
+            return Ok(p.id().to_string());
+        } else {
+            return Ok(properties.address.to_string());
         }
     }
 }
