@@ -12,6 +12,7 @@ pub async fn by_name(
         Some(p) => {
             println!("Connecting with name: {}", name);
             bt.connect(&p.address_uuid).await?;
+            println!("Connected!");
         }
         None => Err("Name not found")?,
     }
@@ -26,6 +27,7 @@ pub async fn by_index(
         Some(p) => {
             println!("Connecting with id: {}", id);
             bt.connect(&p.address_uuid).await?;
+            println!("Connected!");
         }
         None => Err("Id not found")?,
     }
@@ -40,6 +42,7 @@ pub async fn by_address(
         Some(p) => {
             println!("Connecting with address: {}", addr);
             bt.connect(&p.address_uuid).await?;
+            println!("Connected!");
         }
         None => Err("Address not found")?,
     }
