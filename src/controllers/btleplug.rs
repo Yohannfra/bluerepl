@@ -4,13 +4,13 @@ use super::{
 };
 
 use async_trait::async_trait;
+use futures::executor::block_on;
 use futures::stream::StreamExt;
 use std::error::Error;
 use std::thread;
 use std::time::Duration;
 use tokio::time;
 
-// mod utils;
 use crate::utils;
 
 use btleplug::api::{Central, Manager as _, Peripheral, ScanFilter};
@@ -120,46 +120,39 @@ impl BleController for BtleplugController {
         Ok(())
     }
 
-    async fn notify(&mut self, service: &str, characteristic: &str) -> Result<(), Box<dyn Error>> {
-        let mut char_found = false;
+    async fn notify(&mut self, _service: &str, characteristic: &str) -> Result<(), Box<dyn Error>> {
+        if let Some(p) = &self.peripheral {
+            let c = p
+                .characteristics()
+                .into_iter()
+                .find(|c| c.uuid.to_string() == characteristic);
 
-        for p in &self.adapter.peripherals().await? {
-            if p.is_connected().await? {
-                for c in p.characteristics() {
-                    if c.uuid.to_string() == characteristic {
-                        if c.properties.contains(btleplug::api::CharPropFlags::NOTIFY) == false {
-                            Err(format!(
-                                "Characteristic {} doesn't have the notify attribute",
-                                c.uuid.to_string()
-                            ))?;
-                        }
-                        char_found = true;
-                        println!(
-                            "Subscribing to Characteristic {} notifications ...",
-                            c.uuid.to_string()
-                        );
-                        p.subscribe(&c).await?;
-                        let mut notification_stream = p.notifications().await?;
-                        while let Some(data) = notification_stream.next().await {
-                            println!("Received data from [{:?}]: {:?}", data.uuid, data.value);
-                        }
-                        // thread::spawn(|| {
-                        //     for i in 1..10 {
-                        //         println!("hi number {} from the spawned thread!", i);
-                        //         thread::sleep(Duration::from_millis(1));
-                        //     }
-                        // });
-                        println!("OK");
-                    }
+            if let Some(c) = c {
+                if c.properties.contains(btleplug::api::CharPropFlags::NOTIFY) == false {
+                    Err(format!(
+                        "Characteristic {} doesn't have the notify attribute",
+                        c.uuid.to_string()
+                    ))?;
                 }
+                println!(
+                    "Subscribing to characteristic {} notifications ...",
+                    c.uuid.to_string()
+                );
+
+                p.subscribe(&c).await?;
+                let mut notification_stream = p.notifications().await?;
+                thread::spawn(move || {
+                    while let Some(data) = block_on(notification_stream.next()) {
+                        println!("Notification from [{:?}]: {:?}", data.uuid, data.value);
+                    }
+                    thread::sleep(Duration::from_millis(1));
+                });
+                println!("OK");
             }
+            Ok(())
+        } else {
+            Err("You must be connected to notify")?
         }
-
-        if char_found == false {
-            Err(format!("Characteristic: {} not found", characteristic))?
-        }
-
-        Ok(())
     }
 
     async fn get_peripheral_infos(&self) -> Result<BlePeripheralInfo, Box<dyn Error>> {
