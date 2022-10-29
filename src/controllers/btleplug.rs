@@ -2,6 +2,7 @@ use super::{
     BleController, BlePeripheral, BlePeripheralInfo, Characteristic, CharacteristicProperties,
     Service,
 };
+
 use async_trait::async_trait;
 use futures::stream::StreamExt;
 use std::error::Error;
@@ -106,7 +107,7 @@ impl BleController for BtleplugController {
                 .find(|c| c.uuid.to_string() == characteristic);
 
             if let Some(c) = c {
-                println!("Reading Characteristic {} ...", c.uuid);
+                println!("Reading characteristic {} ...", c.uuid);
                 let content = p.read(&c).await?;
                 println!("{:?}", content);
             } else {
@@ -217,7 +218,7 @@ impl BleController for BtleplugController {
                 }
                 infos.services.push(ser);
             }
-            return Ok(infos);
+            Ok(infos)
         } else {
             Err("You must be connected to get peripheral infos")?
         }
@@ -239,7 +240,7 @@ impl BleController for BtleplugController {
                 p.connect().await?;
 
                 self.peripheral = Some(Box::new(p.clone()));
-                return Ok(())
+                return Ok(());
             }
         }
         Err(format!("Peripheral with uuid {} not found", uuid))?
