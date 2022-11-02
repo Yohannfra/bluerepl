@@ -6,9 +6,9 @@ pub async fn indicate(
     service: &str,
     characteristic: &str,
 ) -> Result<(), Box<dyn Error>> {
-    if bt.is_connected() == false {
+    if !bt.is_connected() {
         Err("You must be connected to a peripheral to run this command")?;
     }
 
-    bt.indicate(&service, &characteristic).await
+    bt.indicate(service, characteristic).await
 }

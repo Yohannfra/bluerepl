@@ -50,7 +50,7 @@ impl BleController for BtleplugController {
                 company_code = *code as usize;
             }
 
-            let rssi: i16 = properties.rssi.unwrap_or_else(|| 0);
+            let rssi: i16 = properties.rssi.unwrap_or(0);
 
             periph_vec.push(BlePeripheral {
                 name,
@@ -132,16 +132,13 @@ impl BleController for BtleplugController {
                 .find(|c| c.uuid.to_string() == characteristic);
 
             if let Some(c) = c {
-                if c.properties.contains(btleplug::api::CharPropFlags::NOTIFY) == false {
+                if !c.properties.contains(btleplug::api::CharPropFlags::NOTIFY) {
                     Err(format!(
                         "Characteristic {} doesn't have the notify attribute",
-                        c.uuid.to_string()
+                        c.uuid
                     ))?;
                 }
-                println!(
-                    "Subscribing to characteristic {} notifications ...",
-                    c.uuid.to_string()
-                );
+                println!("Subscribing to characteristic {} notifications ...", c.uuid);
 
                 p.subscribe(&c).await?;
                 println!("OK");
@@ -166,19 +163,16 @@ impl BleController for BtleplugController {
                 .find(|c| c.uuid.to_string() == characteristic);
 
             if let Some(c) = c {
-                if c.properties
+                if !c
+                    .properties
                     .contains(btleplug::api::CharPropFlags::INDICATE)
-                    == false
                 {
                     Err(format!(
                         "Characteristic {} doesn't have the indicate attribute",
-                        c.uuid.to_string()
+                        c.uuid
                     ))?;
                 }
-                println!(
-                    "Subscribing to characteristic {} indications ...",
-                    c.uuid.to_string()
-                );
+                println!("Subscribing to characteristic {} indications ...", c.uuid);
 
                 p.subscribe(&c).await?;
                 println!("OK");
@@ -203,19 +197,19 @@ impl BleController for BtleplugController {
                 .find(|c| c.uuid.to_string() == characteristic);
 
             if let Some(c) = c {
-                if c.properties.contains(btleplug::api::CharPropFlags::NOTIFY) == false
-                    && c.properties
+                if !c.properties.contains(btleplug::api::CharPropFlags::NOTIFY)
+                    && !c
+                        .properties
                         .contains(btleplug::api::CharPropFlags::INDICATE)
-                        == false
                 {
                     Err(format!(
                         "Characteristic {} doesn't have the notify or indicate attribute",
-                        c.uuid.to_string()
+                        c.uuid
                     ))?;
                 }
                 println!(
                     "Unsubscribing from characteristic {} notifications ...",
-                    c.uuid.to_string()
+                    c.uuid
                 );
                 p.unsubscribe(&c).await?;
                 println!("OK");
@@ -239,8 +233,8 @@ impl BleController for BtleplugController {
                 periph_name: properties
                     .local_name
                     .unwrap_or_else(|| String::from("unknown")),
-                periph_mac: self.get_address_or_uuid(&p).await?,
-                rssi: properties.rssi.unwrap_or_else(|| 0),
+                periph_mac: self.get_address_or_uuid(p).await?,
+                rssi: properties.rssi.unwrap_or(0),
                 services: Vec::new(),
             };
 
@@ -297,11 +291,11 @@ impl BleController for BtleplugController {
                 .local_name
                 .unwrap_or_else(|| String::from("unknown"));
 
-            if uuid == self.get_address_or_uuid(&p).await? {
+            if uuid == self.get_address_or_uuid(p).await? {
                 println!(
                     "Connecting to {} with uuid: {}",
                     name,
-                    self.get_address_or_uuid(&p).await?
+                    self.get_address_or_uuid(p).await?
                 );
                 p.connect().await?;
                 self.peripheral = Some(Box::new(p.clone()));
@@ -386,9 +380,9 @@ impl BtleplugController {
         let properties = p.properties().await?.unwrap();
 
         if cfg!(target_os = "macos") {
-            return Ok(p.id().to_string());
+            Ok(p.id().to_string())
         } else {
-            return Ok(properties.address.to_string());
+            Ok(properties.address.to_string())
         }
     }
 

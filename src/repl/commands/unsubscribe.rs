@@ -6,9 +6,9 @@ pub async fn unsubscribe(
     service: &str,
     characteristic: &str,
 ) -> Result<(), Box<dyn Error>> {
-    if bt.is_connected() == false {
+    if !bt.is_connected() {
         Err("You must be connected to a peripheral to run this command")?;
     }
 
-    bt.unsubscribe(&service, &characteristic).await
+    bt.unsubscribe(service, characteristic).await
 }
