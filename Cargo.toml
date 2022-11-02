@@ -1,5 +1,6 @@
 [package]
-name = "blerepl-rs"
+name = "bluerepl"
+description = "A ble client running in the terminal"
 version = "0.1.0"
 edition = "2021"
 

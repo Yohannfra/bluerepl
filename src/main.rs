@@ -36,7 +36,7 @@ struct Args {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    println!("BlueREPL Version: {}", env!("CARGO_PKG_VERSION"));
+    println!("bluerepl Version: {}", env!("CARGO_PKG_VERSION"));
 
     let args = Args::parse();
 

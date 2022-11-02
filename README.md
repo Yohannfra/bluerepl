@@ -1,11 +1,11 @@
-# BlueRepl
+# bluerepl
 
-BlueRepl is a command line application to interact with Bluetooth Low Energy (BLE) peripherals.
+bluerepl is a command line application to interact with Bluetooth Low Energy (BLE) peripherals.
 
 # Build and install
 
 ```shell
-$ git clone https://github.com/Yohannfra/BlueRepl-rs
+$ git clone https://github.com/Yohannfra/bluerepl
 
 $ cargo build
 
