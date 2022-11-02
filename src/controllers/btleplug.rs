@@ -154,6 +154,43 @@ impl BleController for BtleplugController {
         }
     }
 
+    async fn indicate(
+        &mut self,
+        _service: &str,
+        characteristic: &str,
+    ) -> Result<(), Box<dyn Error>> {
+        if let Some(p) = &self.peripheral {
+            let c = p
+                .characteristics()
+                .into_iter()
+                .find(|c| c.uuid.to_string() == characteristic);
+
+            if let Some(c) = c {
+                if c.properties
+                    .contains(btleplug::api::CharPropFlags::INDICATE)
+                    == false
+                {
+                    Err(format!(
+                        "Characteristic {} doesn't have the indicate attribute",
+                        c.uuid.to_string()
+                    ))?;
+                }
+                println!(
+                    "Subscribing to characteristic {} indications ...",
+                    c.uuid.to_string()
+                );
+
+                p.subscribe(&c).await?;
+                println!("OK");
+                Ok(())
+            } else {
+                Err(format!("Characteristic {} not found", characteristic))?
+            }
+        } else {
+            Err("You must be connected to indicate")?
+        }
+    }
+
     async fn unsubscribe(
         &mut self,
         _service: &str,
@@ -166,9 +203,13 @@ impl BleController for BtleplugController {
                 .find(|c| c.uuid.to_string() == characteristic);
 
             if let Some(c) = c {
-                if c.properties.contains(btleplug::api::CharPropFlags::NOTIFY) == false {
+                if c.properties.contains(btleplug::api::CharPropFlags::NOTIFY) == false
+                    && c.properties
+                        .contains(btleplug::api::CharPropFlags::INDICATE)
+                        == false
+                {
                     Err(format!(
-                        "Characteristic {} doesn't have the notify attribute",
+                        "Characteristic {} doesn't have the notify or indicate attribute",
                         c.uuid.to_string()
                     ))?;
                 }

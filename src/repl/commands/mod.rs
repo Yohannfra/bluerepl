@@ -1,6 +1,7 @@
 pub mod clear;
 pub mod connect;
 pub mod disconnect;
+pub mod indicate;
 pub mod info;
 pub mod notify;
 pub mod read;
