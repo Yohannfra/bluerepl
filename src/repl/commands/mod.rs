@@ -5,4 +5,5 @@ pub mod info;
 pub mod notify;
 pub mod read;
 pub mod scan;
+pub mod unsubscribe;
 pub mod write;
