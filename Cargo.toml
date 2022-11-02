@@ -2,7 +2,10 @@
 name = "bluerepl"
 description = "A ble client running in the terminal"
 version = "0.1.0"
+license = "MIT"
+readme = "README.md"
 edition = "2021"
+repository = "https://github.com/Yohannfra/bluerepl"
 
 [dependencies]
 rustyline = "10.0.0"
