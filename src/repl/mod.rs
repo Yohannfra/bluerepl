@@ -138,7 +138,10 @@ impl Repl<'_> {
             }
 
             Some(("unsubscribe", mt)) => {
-                println!("{:?}", mt);
+                let service = mt.get_one::<String>("service").unwrap();
+                let characteristic = mt.get_one::<String>("characteristic").unwrap();
+
+                commands::unsubscribe::unsubscribe(self.bt, service, characteristic).await?;
             }
 
             Some(("preset", mt)) => {
