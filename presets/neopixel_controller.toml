@@ -12,6 +12,9 @@ uuid = "0000beb6-0000-1000-8000-00805f9b34fb"
 [services.neopixels.characteristics.read]
 uuid = "0000cad8-0000-1000-8000-00805f9b34fb"
 
+[services.neopixels.characteristics.button]
+uuid = "0000dac4-0000-1000-8000-00805f9b34fb"
+
 [commands.clear]
 command_type = "write"
 service = "neopixels"
@@ -44,3 +47,13 @@ characteristic = "read"
 [functions.blink_rgb]
 commands_delay_ms = [1000, 1000, 1000, 0]
 commands = ["all_red", "all_green", "all_blue", "clear"]
+
+[commands.sub_button]
+command_type = "notify"
+service = "neopixels"
+characteristic = "button"
+
+[commands.unsub_button]
+command_type = "unsubscribe"
+service = "neopixels"
+characteristic = "button"
