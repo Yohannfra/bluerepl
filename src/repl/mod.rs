@@ -16,7 +16,7 @@ pub struct Repl<'a> {
     preset: Option<Preset>,
 }
 
-const HISTORY_FP: &str = ".history.txt";
+const HISTORY_FP: &str = ".bluerepl_history.txt";
 
 impl Repl<'_> {
     pub async fn new(bt: &mut dyn BleController) -> Repl {
