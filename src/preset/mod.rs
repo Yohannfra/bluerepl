@@ -261,7 +261,15 @@ impl Preset {
             "read" => {
                 commands::read::read(bt, &service_uuid, &characteristic_uuid).await?;
             }
-            "notify" => (),
+            "notify" => {
+                commands::notify::notify(bt, &service_uuid, &characteristic_uuid).await?;
+            }
+            "indicate" => {
+                commands::indicate::indicate(bt, &service_uuid, &characteristic_uuid).await?;
+            }
+            "unsubscribe" => {
+                commands::unsubscribe::unsubscribe(bt, &service_uuid, &characteristic_uuid).await?;
+            },
 
             _ => panic!("Invalid command type '{}'", command.command_type),
         };
