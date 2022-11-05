@@ -48,7 +48,7 @@ pub fn cli() -> Command<'static> {
         // read
         .subcommand(
             Command::new("read")
-            .about("read the value of a characteristic")
+            .about("Read the value of a characteristic")
             .args(&[
                 Arg::new("service").help("The service that contains the characteristic to write").required(true),
                 Arg::new("characteristic").help("The characteristic to write").required(true),
@@ -68,7 +68,7 @@ pub fn cli() -> Command<'static> {
         .subcommand(
             Command::new("info")
             .subcommand_required(true)
-            .about("print informations about topic")
+            .about("Print informations about a specified topic")
             .subcommands(vec![
                 Command::new("adapter").about("Print informations about BLE adapter in use"),
                 Command::new("gatt").about("Print informations about the gatt of the connected peripheral"),
