@@ -36,9 +36,9 @@ Launch the application with the **bleurepl** command, once started it will displ
 
 ```bash
 $ bluerepl
->> bleurepl Version: X.X.X
-Using BLE adapter: *****
->>
+bleurepl Version: 0.1.2
+Using BLE adapter: "CoreBluetooth"
+>> ...
 ```
 
 Once started you can type **help** to see all available commands and their usages or a help text about a specific command.
@@ -51,11 +51,11 @@ COMMANDS:
     disconnect     Disconnect from BLE peripheral
     help           Print this message or the help of the given subcommand(s)
     indicate       Subscribe to a characteristic indications and print it's value when it gets updated
-    info           print informations about topic
+    info           Print informations about a specified topic
     notify         Subscribe to a characteristic notifications and print it's value when it gets updated
     preset         Print preset informations or run preset commands/functions
     quit           Quit the REPL
-    read           read the value of a characteristic
+    read           Read the value of a characteristic
     scan           Search for BLE devices around
     unsubscribe    Unsubscribe from the notifications or indications of a characteristic
     write          Write a value to a characteristic
