@@ -25,9 +25,6 @@ Clear the terminal
 
 USAGE:
     clear
-
-OPTIONS:
-    -h, --help    Print help information
 ```
 
 Example:
@@ -48,7 +45,6 @@ ARGS:
     <identifier>    Parse identifier and use it to connect with name, mac or id
 
 OPTIONS:
-    -h, --help           Print help information
     -i, --id <id>        Connection using the id of the peripheral in the scan list
     -m, --mac <mac>      Connection using the mac address of the peripheral
     -n, --name <name>    Connection using the name of the peripheral
@@ -81,9 +77,6 @@ Disconnect from BLE peripheral
 
 USAGE:
     disconnect
-
-OPTIONS:
-    -h, --help    Print help information
 ```
 
 Example:
@@ -127,9 +120,6 @@ USAGE:
 ARGS:
     <service>           The service that contains the characteristic to subscribe to
     <characteristic>    The characteristic to subscribe to
-
-OPTIONS:
-    -h, --help    Print help information
 ```
 
 Example:
@@ -148,13 +138,9 @@ Print informations about a specified topic
 USAGE:
     info <SUBCOMMAND>
 
-OPTIONS:
-    -h, --help    Print help information
-
 SUBCOMMANDS:
     adapter    Print informations about BLE adapter in use
     gatt       Print informations about the gatt of the connected peripheral
-    help       Print this message or the help of the given subcommand(s)
 ```
 
 Examples:
@@ -179,9 +165,6 @@ USAGE:
 ARGS:
     <service>           The service that contains the characteristic to subscribe to
     <characteristic>    The characteristic to subscribe to
-
-OPTIONS:
-    -h, --help    Print help information
 ```
 
 Example:
@@ -200,13 +183,9 @@ Print preset informations or run preset commands/functions
 USAGE:
     preset [SUBCOMMAND]
 
-OPTIONS:
-    -h, --help    Print help information
-
 SUBCOMMANDS:
     command     Run preset command
     function    Run preset function
-    help        Print this message or the help of the given subcommand(s)
 ```
 
 Examples:
@@ -230,9 +209,6 @@ Quit the REPL
 
 USAGE:
     quit
-
-OPTIONS:
-    -h, --help    Print help information
 ```
 
 Example:
@@ -254,9 +230,6 @@ USAGE:
 ARGS:
     <service>           The service that contains the characteristic to write
     <characteristic>    The characteristic to write
-
-OPTIONS:
-    -h, --help    Print help information
 ```
 
 Example:
@@ -283,7 +256,6 @@ ARGS:
 
 OPTIONS:
     -a, --all     Show unnamed peripheral
-    -h, --help    Print help information
     -l, --list    Show last scan list (doesn't run a new scan)
 ```
 
@@ -315,9 +287,6 @@ USAGE:
 ARGS:
     <service>           The service that contains the characteristic to unsubscribe from
     <characteristic>    The characteristic to unsubscribe from
-
-OPTIONS:
-    -h, --help    Print help information
 ```
 
 Example:
@@ -342,6 +311,5 @@ ARGS:
     <payload>           The payload to write
 
 OPTIONS:
-    -h, --help      Print help information
     -n, --noresp    Write no response (default write is write with response)
 ```
