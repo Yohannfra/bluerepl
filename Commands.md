@@ -1,5 +1,23 @@
 # bluerepl command documentation
 
+## Summary
+
+- [clear](#clear)
+- [connect](#connect)
+- [disconnect](#disconnect)
+- [help](#help)
+- [indicate](#indicate)
+- [info](#info)
+- [notify](#notify)
+- [preset](#preset)
+- [quit](#quit)
+- [read](#read)
+- [scan](#scan)
+- [unsubscribe](#unsubscribe)
+- [write](#write)
+
+---
+
 ## clear
 
 ```
@@ -11,6 +29,14 @@ USAGE:
 OPTIONS:
     -h, --help    Print help information
 ```
+
+Example:
+```bash
+# clear the screen
+>> clear
+```
+
+---
 
 ## connect
 
@@ -26,8 +52,27 @@ OPTIONS:
     -i, --id <id>        Connection using the id of the peripheral in the scan list
     -m, --mac <mac>      Connection using the mac address of the peripheral
     -n, --name <name>    Connection using the name of the peripheral
-
 ```
+
+Examples:
+```bash
+# connect to peripheral with id 3 in the scan list
+>> connect -i 3
+# also works without -i
+>> connect 3
+
+# connect to peripheral named hrs_sensor
+>> connect -n hrs_sensor
+# also works without -n
+>> connect hrs_sensor
+
+# connect to peripheral with mac address 11:22:33:44:55:66
+>> connect -m 11:22:33:44:55:66
+# also works without -m
+>> connect 11:22:33:44:55:66
+```
+
+---
 
 ## disconnect
 
@@ -41,6 +86,14 @@ OPTIONS:
     -h, --help    Print help information
 ```
 
+Example:
+```bash
+# when connected to a peripheral
+>> disconnect
+```
+
+---
+
 ## help
 
 ```
@@ -52,6 +105,16 @@ USAGE:
 ARGS:
     <SUBCOMMAND>...    The subcommand whose help message to display
 ```
+
+Examples:
+```bash
+# global help message
+>> help
+
+# help about a specific command 
+>> help read
+```
+---
 
 ## indicate
 
@@ -68,6 +131,8 @@ ARGS:
 OPTIONS:
     -h, --help    Print help information
 ```
+
+---
 
 ## info
 
@@ -86,6 +151,8 @@ SUBCOMMANDS:
     help       Print this message or the help of the given subcommand(s)
 ```
 
+---
+
 ## notify
 
 ```
@@ -101,6 +168,8 @@ ARGS:
 OPTIONS:
     -h, --help    Print help information
 ```
+
+---
 
 ## preset
 
@@ -119,6 +188,8 @@ SUBCOMMANDS:
     help        Print this message or the help of the given subcommand(s)
 ```
 
+---
+
 ## quit
 
 ```
@@ -130,6 +201,14 @@ USAGE:
 OPTIONS:
     -h, --help    Print help information
 ```
+
+Example:
+```bash
+# close the repl and exit the program
+>> quit
+```
+
+---
 
 ## read
 
@@ -146,6 +225,17 @@ ARGS:
 OPTIONS:
     -h, --help    Print help information
 ```
+
+Example:
+```bash
+# read the value of a characteristic with a 16 bits uuid
+>> read 180f 2a19
+
+# read the value of a characteristic with a long uuid
+>> read 0000180a-0000-1000-8000-00805f9b34fb 00002a24-0000-1000-8000-00805f9b34fb
+```
+
+---
 
 ## scan
 
@@ -164,6 +254,23 @@ OPTIONS:
     -l, --list    Show last scan list (doesn't run a new scan)
 ```
 
+Examples:
+```bash
+# scan for 5 seconds
+>> scan
+
+# scan for 2 seconds
+>> scan 2
+
+# scan for 4 seconds and display unnamed peripheral
+>> scan 4 -a
+
+# print previous scan list
+>> scan -l
+```
+
+---
+
 ## unsubscribe
 
 ```
@@ -179,6 +286,8 @@ ARGS:
 OPTIONS:
     -h, --help    Print help information
 ```
+
+---
 
 ## write
 
