@@ -132,6 +132,12 @@ OPTIONS:
     -h, --help    Print help information
 ```
 
+Example:
+```bash
+# subscribe to a service indications
+>> indicate 0000180a-0000-1000-8000-00805f9b34fb 00002a24-0000-1000-8000-00805f9b34fb
+```
+
 ---
 
 ## info
@@ -149,6 +155,15 @@ SUBCOMMANDS:
     adapter    Print informations about BLE adapter in use
     gatt       Print informations about the gatt of the connected peripheral
     help       Print this message or the help of the given subcommand(s)
+```
+
+Examples:
+```bash
+# print informations about the ble adapter in use
+>> info adapter
+
+# print informations about gatt of the connected peripheral, this will print all it's services and characteristics
+>> info gatt
 ```
 
 ---
@@ -169,6 +184,12 @@ OPTIONS:
     -h, --help    Print help information
 ```
 
+Example:
+```bash
+# subscribe to a service notifications
+>> notify 0000180a-0000-1000-8000-00805f9b34fb 00002a24-0000-1000-8000-00805f9b34fb
+```
+
 ---
 
 ## preset
@@ -186,6 +207,18 @@ SUBCOMMANDS:
     command     Run preset command
     function    Run preset function
     help        Print this message or the help of the given subcommand(s)
+```
+
+Examples:
+```bash
+# display preset content
+>> preset
+
+# run a command called 'blink_red' defined in preset
+>> preset command blink_red
+
+# run a function called 'blink_all' defined in preset
+>> preset function blink_all
 ```
 
 ---
@@ -285,6 +318,12 @@ ARGS:
 
 OPTIONS:
     -h, --help    Print help information
+```
+
+Example:
+```bash
+# unsubscribe from a service notifications or indications
+>> unsubscribe 0000180a-0000-1000-8000-00805f9b34fb 00002a24-0000-1000-8000-00805f9b34fb
 ```
 
 ---
