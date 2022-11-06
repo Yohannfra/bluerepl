@@ -313,3 +313,52 @@ ARGS:
 OPTIONS:
     -n, --noresp    Write no response (default write is write with response)
 ```
+
+The payload of the **write** command is given to a ['parser'](https://github.com/Yohannfra/str_to_bytes) that will convert all the values written as string to bytes.
+
+It detects 'identifier' and convert the values based on them, the supported identifier are:
+- Hexadecimal with **0x** and **0X**. ```0xff 0X44 0x23 ...```
+- Binary with **0b** and **0B**. ```0b10 0B1001 0b1010111011001```
+- Decimal with written decimal number. ```12 24 55624 ...```
+- Ascii string with a special **ASCII()** syntax. ```ASCII(Hello) ASCII(Hi mom)```
+
+All values larger than a single byte (0xff / 255 / 0b11111111) will be correctly splitted in as many bytes as needed:
+
+```
+0b1111111101 => 0b11111111 0b01
+0xffabcd => 0xff 0xab 0xcd
+256 => 255 1
+...
+```
+
+The killer feature is that all these syntax can be used together in the same command.
+
+
+Examples:
+```bash
+# let's assume for these examples that a is service uuid and b is characteristic uuid
+
+# simply write 0xff to the characteristic
+>> write a b 0xff
+>> write a b 255
+>> write a b 0b11111111
+
+# write hello world (notice that the quotes are needed for the space)
+>> write a b "ASCII(hello world)"
+# or just hello
+>> write a b ASCII(hello)
+
+# write multiple bytes
+>> write a b "0xff00ff"
+# is the same as
+>> write a b "0xff 0x00 0xff"
+
+# also works for binary and decimal
+>> write a b "0b11 0b11100 0b110011001010111001011010"
+>> write a b "12 32 429 21313"
+
+# mixing everyting together
+>> write "0b11 1242 0 0x45 0xff422 ASCII(HI)"
+
+...
+```

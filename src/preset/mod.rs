@@ -269,7 +269,7 @@ impl Preset {
             }
             "unsubscribe" => {
                 commands::unsubscribe::unsubscribe(bt, &service_uuid, &characteristic_uuid).await?;
-            },
+            }
 
             _ => panic!("Invalid command type '{}'", command.command_type),
         };
