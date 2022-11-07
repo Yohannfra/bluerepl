@@ -331,7 +331,7 @@ All values larger than a single byte (0xff / 255 / 0b11111111) will be correctly
 ...
 ```
 
-The killer feature is that all these syntax can be used together in the same command.
+**And all these syntaxes can be used together in the same command.**
 
 
 Examples:
