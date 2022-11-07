@@ -21,29 +21,42 @@ fn print_gatt_infos(infos: &BlePeripheralInfo) {
     table.add_row(vec![Cell::new("Service(s)").add_attribute(Attribute::Bold)]);
 
     for s in &infos.services {
-        let fmt_service = format!(
-            "{}\n{}\n{}",
-            s.uuid,
-            services_uuids::get_service_name_from_uuid(&s.uuid).unwrap_or_else(|| "".to_owned()),
-            services_uuids::get_service_identifier_from_uuid(&s.uuid)
-                .unwrap_or_else(|| "".to_owned())
-        );
-        let mut vec_service = vec!["UUID\nName\nIdentifier".to_owned(), fmt_service];
+        let mut str_service: String = "UUID".to_owned();
+        let mut fmt_service: String = s.uuid.to_string();
+
+        // Service name
+        if let Some(name) = services_uuids::get_service_name_from_uuid(&s.uuid) {
+            fmt_service.push_str(&format!("\n{}", name));
+            str_service.push_str("\nName");
+        }
+
+        // Service identifier
+        if let Some(identifier) = services_uuids::get_service_identifier_from_uuid(&s.uuid) {
+            fmt_service.push_str(&format!("\n{}", identifier));
+            str_service.push_str("\nIdentifier");
+        }
+
+        let mut vec_service: Vec<String> = vec![str_service, fmt_service];
 
         for c in &s.characteriscics {
             vec_service[0].push_str("\n\nCharacteristic:\n");
-            vec_service[0].push_str(" - UUID:\n - Name\n - Identifier\n - Properties");
-            vec_service[1].push_str(&format!(
-                "\n\n\n{}\n{}\n{}\n{:?}",
-                c.uuid,
-                characteristic_uuids::get_characteristic_name_from_uuid(&c.uuid)
-                    .unwrap_or_else(|| "".to_owned()),
-                characteristic_uuids::get_characteristic_identifier_from_uuid(&c.uuid)
-                    .unwrap_or_else(|| "".to_owned()),
-                c.properties
-            ));
-        }
+            vec_service[0].push_str(" - UUID:\n - Properties");
+            vec_service[1].push_str(&format!("\n\n\n{}\n{:?}", c.uuid, c.properties));
 
+            // Characteristic name
+            if let Some(name) = characteristic_uuids::get_characteristic_name_from_uuid(&c.uuid) {
+                vec_service[0].push_str("\n - Name");
+                vec_service[1].push_str(&format!("\n{}", name))
+            }
+
+            // Characteristic identifier
+            if let Some(identifier) =
+                characteristic_uuids::get_characteristic_identifier_from_uuid(&c.uuid)
+            {
+                vec_service[0].push_str("\n - Identifier");
+                vec_service[1].push_str(&format!("\n{}", identifier))
+            }
+        }
         table.add_row(vec_service);
     }
 
