@@ -49,7 +49,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let mut repl = Repl::new(&mut bt).await;
 
-    if args.preset_file != None {
+    if args.preset_file.is_some() {
         let mut pr = Preset::new(args.preset_file.unwrap()).unwrap();
 
         if args.autoconnect {
