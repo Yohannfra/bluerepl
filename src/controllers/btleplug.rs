@@ -78,6 +78,7 @@ impl BleController for BtleplugController {
         _service: &str,
         characteristic: &str,
         payload: &[u8],
+        response: bool,
     ) -> Result<(), Box<dyn Error>> {
         if let Some(p) = &self.peripheral {
             p.discover_services().await.unwrap();
@@ -89,8 +90,16 @@ impl BleController for BtleplugController {
 
             if let Some(c) = c {
                 println!("Writing {:?} to characteristic {}", payload, c.uuid);
-                p.write(&c, payload, btleplug::api::WriteType::WithoutResponse)
-                    .await?;
+                p.write(
+                    &c,
+                    payload,
+                    if response {
+                        btleplug::api::WriteType::WithResponse
+                    } else {
+                        btleplug::api::WriteType::WithoutResponse
+                    },
+                )
+                .await?;
             } else {
                 Err(format!("Characteristic: {} not found", characteristic))?
             }

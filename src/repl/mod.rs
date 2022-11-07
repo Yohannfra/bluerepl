@@ -68,8 +68,9 @@ impl Repl<'_> {
                 let service = mt.get_one::<String>("service").unwrap();
                 let characteristic = mt.get_one::<String>("characteristic").unwrap();
                 let payload = mt.get_one::<String>("payload").unwrap();
+                let response: bool = mt.contains_id("resp");
 
-                commands::write::write(self.bt, service, characteristic, payload).await?;
+                commands::write::write(self.bt, service, characteristic, payload, response).await?;
             }
 
             Some(("read", mt)) => {

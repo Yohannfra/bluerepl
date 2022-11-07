@@ -87,6 +87,7 @@ pub trait BleController {
         service: &str,
         characteristic: &str,
         payload: &[u8],
+        response: bool,
     ) -> Result<(), Box<dyn Error>>;
 
     async fn read(&mut self, service: &str, characteristic: &str) -> Result<(), Box<dyn Error>>;

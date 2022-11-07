@@ -311,7 +311,7 @@ ARGS:
     <payload>           The payload to write
 
 OPTIONS:
-    -n, --noresp    Write no response (default write is write with response)
+    -r, --resp    Write with response (default write is write without response)
 ```
 
 The payload of the **write** command is given to a ['parser'](https://github.com/Yohannfra/str_to_bytes) that will convert all the values written as string to bytes.

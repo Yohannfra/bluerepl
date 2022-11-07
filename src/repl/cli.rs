@@ -39,7 +39,7 @@ pub fn cli() -> Command<'static> {
             Command::new("write")
             .about("Write a value to a characteristic")
             .args(&[
-                arg!(-n --noresp ... "Write no response (default write is write with response)"),
+                arg!(-r --resp ... "Write with response (default write is write without response)"),
                 Arg::new("service").help("The service that contains the characteristic to write").required(true),
                 Arg::new("characteristic").help("The characteristic to write").required(true),
                 Arg::new("payload").help("The payload to write").required(true)

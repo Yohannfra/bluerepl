@@ -255,6 +255,17 @@ impl Preset {
                     &service_uuid,
                     &characteristic_uuid,
                     command.payload.as_ref().unwrap(),
+                    false,
+                )
+                .await?;
+            }
+            "write_with_resp" => {
+                commands::write::write(
+                    bt,
+                    &service_uuid,
+                    &characteristic_uuid,
+                    command.payload.as_ref().unwrap(),
+                    true,
                 )
                 .await?;
             }
