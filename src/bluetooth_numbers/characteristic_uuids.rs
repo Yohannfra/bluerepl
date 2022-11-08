@@ -24,7 +24,7 @@ pub fn get_characteristic_name_from_uuid(
     p: &Option<Preset>,
 ) -> Option<String> {
     for s in PARSED_JSON.iter() {
-        if compare_uuid(&uuid_ser.to_uppercase(), &s.uuid.to_uppercase()) {
+        if compare_uuid(&uuid_char.to_uppercase(), &s.uuid.to_uppercase()) {
             return Some(s.name.clone());
         }
     }
@@ -54,15 +54,15 @@ mod tests {
     #[test]
     fn test_get_characteristic_name_from_uuid() {
         assert_eq!(
-            get_characteristic_name_from_uuid("2A19"),
+            get_characteristic_name_from_uuid("", "2A19", &None),
             Some("Battery Level".to_owned())
         );
         assert_eq!(
-            get_characteristic_name_from_uuid("2A8D"),
+            get_characteristic_name_from_uuid("", "2A8D", &None),
             Some("Heart Rate Max".to_owned())
         );
         assert_eq!(
-            get_characteristic_name_from_uuid("ADAF0E01-C332-42A8-93BD-25E905756CB8"),
+            get_characteristic_name_from_uuid("", "ADAF0E01-C332-42A8-93BD-25E905756CB8", &None),
             Some("Adafruit Proximity".to_owned())
         );
     }
