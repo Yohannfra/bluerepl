@@ -98,7 +98,7 @@ impl Repl<'_> {
                     if !self.bt.is_connected() {
                         Err("You must be connected to a peripheral to run this command")?;
                     }
-                    commands::info::gatt(self.bt).await?;
+                    commands::info::gatt(self.bt, &self.preset).await?;
                 }
                 _ => panic!("Code should never be here"),
             },

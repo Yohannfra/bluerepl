@@ -1,6 +1,8 @@
 use super::compare_uuid::compare_uuid;
 use serde::{Deserialize, Serialize};
 
+use crate::Preset;
+
 static CHARACTERISTICS_UUIDS_JSON_STR: &str = include_str!("characteristic_uuids.json");
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -16,12 +18,23 @@ lazy_static! {
         serde_json::from_str(CHARACTERISTICS_UUIDS_JSON_STR).unwrap();
 }
 
-pub fn get_characteristic_name_from_uuid(uuid: &str) -> Option<String> {
+pub fn get_characteristic_name_from_uuid(
+    uuid_ser: &str,
+    uuid_char: &str,
+    p: &Option<Preset>,
+) -> Option<String> {
     for s in PARSED_JSON.iter() {
-        if compare_uuid(&uuid.to_uppercase(), &s.uuid.to_uppercase()) {
+        if compare_uuid(&uuid_ser.to_uppercase(), &s.uuid.to_uppercase()) {
             return Some(s.name.clone());
         }
     }
+
+    if let Some(preset) = p {
+        if let Some(name) = preset.get_characteristic_name_from_uuid(uuid_ser, uuid_char) {
+            return Some(name);
+        }
+    }
+
     None
 }
 

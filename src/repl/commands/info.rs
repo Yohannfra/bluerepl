@@ -6,8 +6,9 @@ use crate::controllers::BlePeripheralInfo;
 use comfy_table::{Attribute, Cell, Table};
 
 use crate::bluetooth_numbers::{characteristic_uuids, services_uuids};
+use crate::Preset;
 
-fn print_gatt_infos(infos: &BlePeripheralInfo) {
+fn print_gatt_infos(infos: &BlePeripheralInfo, p: &Option<Preset>) {
     let mut table = Table::new();
 
     table.set_header(vec![
@@ -25,7 +26,7 @@ fn print_gatt_infos(infos: &BlePeripheralInfo) {
         let mut fmt_service: String = s.uuid.to_string();
 
         // Service name
-        if let Some(name) = services_uuids::get_service_name_from_uuid(&s.uuid) {
+        if let Some(name) = services_uuids::get_service_name_from_uuid(&s.uuid, p) {
             fmt_service.push_str(&format!("\n{}", name));
             str_service.push_str("\nName");
         }
@@ -44,7 +45,9 @@ fn print_gatt_infos(infos: &BlePeripheralInfo) {
             vec_service[1].push_str(&format!("\n\n\n{}\n{:?}", c.uuid, c.properties));
 
             // Characteristic name
-            if let Some(name) = characteristic_uuids::get_characteristic_name_from_uuid(&c.uuid) {
+            if let Some(name) =
+                characteristic_uuids::get_characteristic_name_from_uuid(&s.uuid, &c.uuid, p)
+            {
                 vec_service[0].push_str("\n - Name");
                 vec_service[1].push_str(&format!("\n{}", name))
             }
@@ -63,9 +66,12 @@ fn print_gatt_infos(infos: &BlePeripheralInfo) {
     println!("{table}");
 }
 
-pub async fn gatt(bt: &mut dyn controllers::BleController) -> Result<(), Box<dyn Error>> {
+pub async fn gatt(
+    bt: &mut dyn controllers::BleController,
+    p: &Option<Preset>,
+) -> Result<(), Box<dyn Error>> {
     let infos: BlePeripheralInfo = bt.get_peripheral_infos().await?;
-    print_gatt_infos(&infos);
+    print_gatt_infos(&infos, p);
 
     Ok(())
 }
