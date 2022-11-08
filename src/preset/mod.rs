@@ -86,8 +86,8 @@ impl Preset {
     }
 
     pub fn should_autoconnect(&self) -> bool {
-        if self.device.is_some() {
-            return self.device.as_ref().unwrap().autoconnect.unwrap_or(false);
+        if let Some(device) = &self.device {
+            return device.autoconnect.unwrap_or(false);
         }
         false
     }
@@ -97,9 +97,8 @@ impl Preset {
         bt: &mut dyn controllers::BleController,
     ) -> Result<(), Box<dyn Error>> {
         commands::scan::run(bt, 5, false, false).await.unwrap();
-        if self.device.as_ref().unwrap().name.is_some() {
-            commands::connect::by_name(bt, self.device.as_ref().unwrap().name.as_ref().unwrap())
-                .await?;
+        if let Some(name) = &self.device.as_ref().unwrap().name {
+            commands::connect::by_name(bt, name).await?;
         } else {
             commands::connect::by_address(
                 bt,

@@ -11,30 +11,28 @@ impl Preset {
         ]);
 
         // Device infos
-        if self.device.is_some() {
-            let device_ref = self.device.as_ref().unwrap();
-
+        if let Some(device) = &self.device {
             table.add_row(vec![
                 "Device name\nDevice address\nDevice Autoconnect",
                 &format!(
                     "{}\n{}\n{}",
-                    device_ref.name.as_ref().unwrap_or(&"".to_owned()),
-                    device_ref.address.as_ref().unwrap_or(&"".to_owned()),
-                    device_ref.autoconnect.unwrap_or(false)
+                    device.name.as_ref().unwrap_or(&"".to_owned()),
+                    device.address.as_ref().unwrap_or(&"".to_owned()),
+                    device.autoconnect.unwrap_or(false)
                 ),
             ]);
         }
 
         // Service(s)
-        if self.services.is_some() {
+        if let Some(services) = &self.services {
             table.add_row(vec![Cell::new("Service").add_attribute(Attribute::Bold)]);
 
-            for (key, ser) in self.services.as_ref().unwrap() {
+            for (key, ser) in services {
                 let fmt_service = format!("{}\n{}", key, ser.uuid);
                 let mut vec_service = vec!["Name\nUUID".to_owned(), fmt_service];
 
-                if ser.characteristics.is_some() {
-                    for (key, charac) in ser.characteristics.as_ref().unwrap() {
+                if let Some(service_characteristics) = &ser.characteristics {
+                    for (key, charac) in service_characteristics {
                         vec_service[0].push_str("\n\nCharacteristic:\n");
                         vec_service[0].push_str(" - Name:\n - UUID");
                         vec_service[1].push_str(&format!("\n\n\n{}\n{}", key, charac.uuid));
@@ -45,9 +43,9 @@ impl Preset {
         }
 
         // Commands
-        if self.commands.is_some() {
+        if let Some(commands) = &self.commands {
             table.add_row(vec![Cell::new("Commands").add_attribute(Attribute::Bold)]);
-            for (key, data) in self.commands.as_ref().unwrap() {
+            for (key, data) in commands {
                 table.add_row(vec![
                     "Name\nType\nService\nCharacteristic\nPayload",
                     &format!(
@@ -63,12 +61,12 @@ impl Preset {
         }
 
         // Functions
-        if self.functions.is_some() {
+        if let Some(functions) = &self.functions {
             table.add_row(vec![Cell::new("Functions").add_attribute(Attribute::Bold)]);
-            for (key, data) in self.functions.as_ref().unwrap() {
+            for (key, data) in functions {
                 table.add_row(vec![
                     "Name\nDelays\nCommands",
-                    &format!("{}\n{:?}\n{:?}", key, data.commands_delay_ms, data.commands,),
+                    &format!("{}\n{:?}\n{:?}", key, data.commands_delay_ms, data.commands),
                 ]);
             }
         }
