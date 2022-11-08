@@ -1,4 +1,4 @@
-use super::{Command, Function, Preset};
+use super::Preset;
 
 impl Preset {
     pub fn verify(&self) {
@@ -48,6 +48,23 @@ impl Preset {
             for f in functions {
                 if f.1.commands.len() != f.1.commands_delay_ms.len() {
                     panic!("In function {} 'commands' and 'commands_delay_ms' don't have the same length", f.0)
+                }
+            }
+        }
+
+        // check that commands used in functions exist
+        if let Some(functions) = &self.functions {
+            for f in functions {
+                for cmd_name in &f.1.commands {
+                    if !self
+                        .commands
+                        .as_ref()
+                        .unwrap()
+                        .iter()
+                        .any(|c| c.0 == cmd_name)
+                    {
+                        panic!("In function '{}' command '{}' doesn't exits", f.0, cmd_name);
+                    }
                 }
             }
         }
