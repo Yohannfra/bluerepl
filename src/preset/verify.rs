@@ -68,5 +68,16 @@ impl Preset {
                 }
             }
         }
+
+        // check that the command_type field in commands exists
+        if let Some(commands) = &self.commands {
+            let available_commands_types: Vec<&str> = vec!["write", "write_with_resp", "read", "notify", "indicate", "unsubscribe"];
+
+            for (cmd_name, cmd_data) in commands {
+                if !available_commands_types.iter().any(|c| *c == cmd_data.command_type) {
+                    panic!("In command '{}' invalid command_type: '{}'. It must be one of {:?}", cmd_name, cmd_data.command_type, available_commands_types);
+                }
+            }
+        }
     }
 }
