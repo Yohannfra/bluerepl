@@ -76,8 +76,9 @@ impl Repl<'_> {
             Some(("read", mt)) => {
                 let service = mt.get_one::<String>("service").unwrap();
                 let characteristic = mt.get_one::<String>("characteristic").unwrap();
+                let format = mt.get_one::<String>("format").unwrap();
 
-                commands::read::read(self.bt, service, characteristic).await?;
+                commands::read::read(self.bt, service, characteristic, format).await?;
             }
 
             Some(("scan", mt)) => {

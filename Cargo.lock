@@ -65,6 +65,7 @@ dependencies = [
  "lazy_static",
  "pre-commit",
  "regex",
+ "rhexdump",
  "rustyline",
  "serde",
  "serde_json",
@@ -908,6 +909,12 @@ name = "regex-syntax"
 version = "0.6.27"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a3f87b73ce11b1619a3c6332f45341e0047173771e8b8b73f87bfeefb7b56244"
+
+[[package]]
+name = "rhexdump"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c5e9af64574935e39f24d1c0313a997c8b880ca0e087c888bc6af8af31579847"
 
 [[package]]
 name = "rustc-serialize"

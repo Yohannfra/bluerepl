@@ -1,3 +1,5 @@
+pub mod print_bytes;
+
 use std::io::Write;
 
 pub fn get_usize_input(prompt: &str) -> usize {

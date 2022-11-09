@@ -90,7 +90,11 @@ pub trait BleController {
         response: bool,
     ) -> Result<(), Box<dyn Error>>;
 
-    async fn read(&mut self, service: &str, characteristic: &str) -> Result<(), Box<dyn Error>>;
+    async fn read(
+        &mut self,
+        service: &str,
+        characteristic: &str,
+    ) -> Result<Vec<u8>, Box<dyn Error>>;
 
     async fn notify(&mut self, service: &str, characteristic: &str) -> Result<(), Box<dyn Error>>;
 

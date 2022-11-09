@@ -64,7 +64,8 @@ impl Preset {
                 .await?;
             }
             "read" => {
-                commands::read::read(bt, &service_uuid, &characteristic_uuid).await?;
+                commands::read::read(bt, &service_uuid, &characteristic_uuid, &command.format)
+                    .await?;
             }
             "notify" => {
                 commands::notify::notify(bt, &service_uuid, &characteristic_uuid).await?;

@@ -39,12 +39,19 @@ pub struct Characteristic {
     uuid: String,
 }
 
+fn format_default() -> String {
+    "hex".to_string()
+}
+
 #[derive(Deserialize, Debug)]
 pub struct Command {
     command_type: String,
     service: String,
     characteristic: String,
     payload: Option<String>,
+
+    #[serde(default = "format_default")]
+    format: String,
 }
 
 #[derive(Deserialize, Debug)]

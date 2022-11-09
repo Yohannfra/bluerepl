@@ -92,5 +92,19 @@ impl Preset {
                 }
             }
         }
+
+        // check that the format field in commands exists
+        if let Some(commands) = &self.commands {
+            let available_formats: Vec<&str> = vec!["bin", "dec", "hex", "text", "hexdump"];
+
+            for (cmd_name, cmd_data) in commands {
+                if !available_formats.iter().any(|c| *c == cmd_data.format) {
+                    panic!(
+                        "In command '{}' invalid format: '{}'. It must be one of {:?}",
+                        cmd_name, cmd_data.format, available_formats
+                    );
+                }
+            }
+        }
     }
 }

@@ -110,7 +110,11 @@ impl BleController for BtleplugController {
         Ok(())
     }
 
-    async fn read(&mut self, _service: &str, characteristic: &str) -> Result<(), Box<dyn Error>> {
+    async fn read(
+        &mut self,
+        _service: &str,
+        characteristic: &str,
+    ) -> Result<Vec<u8>, Box<dyn Error>> {
         if let Some(p) = &self.peripheral {
             p.discover_services().await.unwrap();
 
@@ -122,15 +126,13 @@ impl BleController for BtleplugController {
             if let Some(c) = c {
                 println!("Reading characteristic {} ...", c.uuid);
                 let content = p.read(&c).await?;
-                println!("{:?}", content);
+                return Ok(content);
             } else {
                 Err(format!("Characteristic: {} not found", characteristic))?
             }
         } else {
             Err("You must be connected to read")?
         }
-
-        Ok(())
     }
 
     async fn notify(&mut self, _service: &str, characteristic: &str) -> Result<(), Box<dyn Error>> {
