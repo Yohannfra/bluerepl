@@ -63,6 +63,7 @@ dependencies = [
  "exitcode",
  "futures",
  "lazy_static",
+ "pre-commit",
  "regex",
  "rustyline",
  "serde",
@@ -70,7 +71,7 @@ dependencies = [
  "shlex",
  "str_to_bytes",
  "tokio",
- "toml",
+ "toml 0.5.9",
 ]
 
 [[package]]
@@ -810,6 +811,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1df8c4ec4b0627e53bdf214615ad287367e482558cf84b109250b37464dc03ae"
 
 [[package]]
+name = "pre-commit"
+version = "0.5.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d0f2b9887f84ec91cd86f71c193b883209d744bc8c2a3363c6b1df88efa5af8f"
+dependencies = [
+ "rustc-serialize",
+ "toml 0.2.1",
+]
+
+[[package]]
 name = "proc-macro-error"
 version = "1.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -897,6 +908,12 @@ name = "regex-syntax"
 version = "0.6.27"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a3f87b73ce11b1619a3c6332f45341e0047173771e8b8b73f87bfeefb7b56244"
+
+[[package]]
+name = "rustc-serialize"
+version = "0.3.24"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dcf128d1287d2ea9d80910b5f1120d0b8eede3fbf1abe91c40d39ea7d51e6fda"
 
 [[package]]
 name = "rustix"
@@ -1222,6 +1239,15 @@ dependencies = [
  "futures-sink",
  "pin-project-lite",
  "tokio",
+]
+
+[[package]]
+name = "toml"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "736b60249cb25337bc196faa43ee12c705e426f3d55c214d73a4e7be06f92cb4"
+dependencies = [
+ "rustc-serialize",
 ]
 
 [[package]]
