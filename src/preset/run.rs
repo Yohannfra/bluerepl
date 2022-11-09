@@ -19,9 +19,8 @@ impl Preset {
         }
 
         // get command struct from typed name
-        let command = match self.commands.as_ref().unwrap().get(command_name) {
-            Some(s) => s,
-            None => Err(format!("Command not found {}", command_name))?,
+        let Some(command) = self.commands.as_ref().unwrap().get(command_name) else {
+            return Err(format!("Command not found {}", command_name))?;
         };
 
         let service_def = self
@@ -93,10 +92,9 @@ impl Preset {
             Err("No functions in preset")?;
         }
 
-        // get fucntion struct from typed name
-        let function = match self.functions.as_ref().unwrap().get(function_name) {
-            Some(s) => s,
-            None => Err(format!("Command not found {}", function_name))?,
+        // get function struct from typed name
+        let Some(function) = self.functions.as_ref().unwrap().get(function_name) else {
+            return Err(format!("Command not found {}", function_name))?;
         };
 
         // run function
