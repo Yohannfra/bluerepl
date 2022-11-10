@@ -131,15 +131,17 @@ impl Repl<'_> {
             Some(("indicate", mt)) => {
                 let service = mt.get_one::<String>("service").unwrap();
                 let characteristic = mt.get_one::<String>("characteristic").unwrap();
+                let format = mt.get_one::<String>("format").unwrap();
 
-                commands::indicate::indicate(self.bt, service, characteristic).await?;
+                commands::indicate::indicate(self.bt, service, characteristic, format).await?;
             }
 
             Some(("notify", mt)) => {
                 let service = mt.get_one::<String>("service").unwrap();
                 let characteristic = mt.get_one::<String>("characteristic").unwrap();
+                let format = mt.get_one::<String>("format").unwrap();
 
-                commands::notify::notify(self.bt, service, characteristic).await?;
+                commands::notify::notify(self.bt, service, characteristic, format).await?;
             }
 
             Some(("unsubscribe", mt)) => {

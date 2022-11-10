@@ -68,10 +68,17 @@ impl Preset {
                     .await?;
             }
             "notify" => {
-                commands::notify::notify(bt, &service_uuid, &characteristic_uuid).await?;
+                commands::notify::notify(bt, &service_uuid, &characteristic_uuid, &command.format)
+                    .await?;
             }
             "indicate" => {
-                commands::indicate::indicate(bt, &service_uuid, &characteristic_uuid).await?;
+                commands::indicate::indicate(
+                    bt,
+                    &service_uuid,
+                    &characteristic_uuid,
+                    &command.format,
+                )
+                .await?;
             }
             "unsubscribe" => {
                 commands::unsubscribe::unsubscribe(bt, &service_uuid, &characteristic_uuid).await?;

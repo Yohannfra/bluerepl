@@ -5,10 +5,11 @@ pub async fn notify(
     bt: &mut dyn controllers::BleController,
     service: &str,
     characteristic: &str,
+    format: &str,
 ) -> Result<(), Box<dyn Error>> {
     if !bt.is_connected() {
         Err("You must be connected to a peripheral to run this command")?;
     }
 
-    bt.notify(service, characteristic).await
+    bt.notify(service, characteristic, format).await
 }

@@ -100,6 +100,7 @@ pub fn cli() -> Command<'static> {
             .args(&[
                 Arg::new("service").help("The service that contains the characteristic to subscribe to").required(true),
                 Arg::new("characteristic").help("The characteristic to subscribe to").required(true),
+                arg!(-f --format ... "Format to print the read value").required(false).value_name("format").default_value("hex").value_parser(["bin", "hex", "dec", "text", "hexdump"]),
             ]).help_template(COMMAND_TEMPLATE))
 
         // preset
@@ -126,6 +127,7 @@ pub fn cli() -> Command<'static> {
             .args(&[
                 Arg::new("service").help("The service that contains the characteristic to subscribe to").required(true),
                 Arg::new("characteristic").help("The characteristic to subscribe to").required(true),
+                arg!(-f --format ... "Format to print the read value").required(false).value_name("format").default_value("hex").value_parser(["bin", "hex", "dec", "text", "hexdump"]),
             ]).help_template(COMMAND_TEMPLATE))
 
         // unsubscribe
