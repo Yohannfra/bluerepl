@@ -1,7 +1,7 @@
 [package]
 name = "bluerepl"
 description = "A ble client running in the terminal"
-version = "0.1.5"
+version = "0.1.6"
 license = "MIT"
 readme = "README.md"
 edition = "2021"
