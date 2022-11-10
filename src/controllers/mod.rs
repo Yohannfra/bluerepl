@@ -96,10 +96,19 @@ pub trait BleController {
         characteristic: &str,
     ) -> Result<Vec<u8>, Box<dyn Error>>;
 
-    async fn notify(&mut self, service: &str, characteristic: &str) -> Result<(), Box<dyn Error>>;
+    async fn notify(
+        &mut self,
+        service: &str,
+        characteristic: &str,
+        format: &str,
+    ) -> Result<(), Box<dyn Error>>;
 
-    async fn indicate(&mut self, service: &str, characteristic: &str)
-        -> Result<(), Box<dyn Error>>;
+    async fn indicate(
+        &mut self,
+        service: &str,
+        characteristic: &str,
+        format: &str,
+    ) -> Result<(), Box<dyn Error>>;
 
     async fn unsubscribe(
         &mut self,

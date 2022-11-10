@@ -16,14 +16,16 @@ use crate::utils;
 use btleplug::api::{Central, Manager as _, Peripheral, ScanFilter};
 use btleplug::platform::{Adapter, Manager};
 
+use std::collections::HashMap;
 use std::sync::atomic;
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 
 pub struct BtleplugController {
     adapter: Adapter,
     scan_list: Vec<BlePeripheral>,
     peripheral: Option<Box<btleplug::platform::Peripheral>>,
     notifications_thread_running: Arc<atomic::AtomicBool>,
+    notifications_formats: Arc<Mutex<HashMap<String, String>>>,
 }
 
 #[async_trait]
@@ -135,7 +137,12 @@ impl BleController for BtleplugController {
         }
     }
 
-    async fn notify(&mut self, _service: &str, characteristic: &str) -> Result<(), Box<dyn Error>> {
+    async fn notify(
+        &mut self,
+        _service: &str,
+        characteristic: &str,
+        format: &str,
+    ) -> Result<(), Box<dyn Error>> {
         if let Some(p) = &self.peripheral {
             let c = p
                 .characteristics()
@@ -152,6 +159,12 @@ impl BleController for BtleplugController {
                 println!("Subscribing to characteristic {} notifications ...", c.uuid);
 
                 p.subscribe(&c).await?;
+
+                let ntf = self.notifications_formats.clone();
+                ntf.lock()
+                    .unwrap()
+                    .insert(characteristic.to_owned(), format.to_owned());
+
                 println!("OK");
                 Ok(())
             } else {
@@ -166,6 +179,7 @@ impl BleController for BtleplugController {
         &mut self,
         _service: &str,
         characteristic: &str,
+        format: &str,
     ) -> Result<(), Box<dyn Error>> {
         if let Some(p) = &self.peripheral {
             let c = p
@@ -186,6 +200,10 @@ impl BleController for BtleplugController {
                 println!("Subscribing to characteristic {} indications ...", c.uuid);
 
                 p.subscribe(&c).await?;
+                let ntf = self.notifications_formats.clone();
+                ntf.lock()
+                    .unwrap()
+                    .insert(characteristic.to_owned(), format.to_owned());
                 println!("OK");
                 Ok(())
             } else {
@@ -223,13 +241,15 @@ impl BleController for BtleplugController {
                     c.uuid
                 );
                 p.unsubscribe(&c).await?;
+                let ntf = self.notifications_formats.clone();
+                ntf.lock().unwrap().remove(characteristic);
                 println!("OK");
                 Ok(())
             } else {
                 Err(format!("Characteristic {} not found", characteristic))?
             }
         } else {
-            Err("You must be connected to notify")?
+            Err("You must be connected to unsubscribe")?
         }
     }
 
@@ -381,6 +401,7 @@ impl BtleplugController {
             scan_list: Vec::new(),
             peripheral: None,
             notifications_thread_running: Arc::new(atomic::AtomicBool::new(false)),
+            notifications_formats: Arc::new(Mutex::new(HashMap::new())),
         }
     }
 
@@ -397,16 +418,23 @@ impl BtleplugController {
         }
     }
 
-    async fn start_notifications_thread(&mut self) -> Result<(), Box<dyn Error>> {
+    async fn start_notifications_thread(&self) -> Result<(), Box<dyn Error>> {
         println!("Starting notifications thread");
 
         if let Some(p) = &self.peripheral {
             let mut notification_stream = p.notifications().await?;
             let atomic_is_running = self.notifications_thread_running.clone();
+            let all_formats = self.notifications_formats.clone();
 
             thread::spawn(move || loop {
                 if let Some(data) = block_on(notification_stream.next()) {
-                    println!("Notification from [{:?}]: {:?}", data.uuid, data.value);
+                    let formats_map = all_formats.lock().unwrap();
+                    let fmt = formats_map.get(&data.uuid.to_string()).unwrap();
+                    println!(
+                        "Notification from [{:?}]: {}",
+                        data.uuid,
+                        utils::print_bytes::bytes_to_str(&data.value, fmt)
+                    );
                 }
                 if !atomic_is_running.load(atomic::Ordering::Relaxed) {
                     println!("Stopping notifications thread");
