@@ -69,6 +69,16 @@ impl Preset {
             }
         }
 
+        // check that commands of type read have a payload
+
+        if let Some(commands) = &self.commands {
+            for (cmd_name, cmd_data) in commands {
+                if cmd_data.command_type == "write" && cmd_data.payload.is_none() {
+                    panic!("In command '{}' missing payload", cmd_name);
+                }
+            }
+        }
+
         // check that the command_type field in commands exists
         if let Some(commands) = &self.commands {
             let available_commands_types: Vec<&str> = vec![
