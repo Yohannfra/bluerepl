@@ -53,6 +53,21 @@ impl Repl<'_> {
         }
     }
 
+    fn try_replacing_service_and_characteristics_with_preset_defs(
+        &self,
+        service: &mut String,
+        characteristic: &mut String,
+    ) {
+        if let Some(preset) = &self.preset {
+            if let Some(uuid) = preset.get_service_uuid_from_name(service) {
+                *service = uuid;
+            }
+            if let Some(uuid) = preset.get_characteristic_uuid_from_name(service, characteristic) {
+                *characteristic = uuid;
+            }
+        }
+    }
+
     async fn execute_command(&mut self, matches: clap::ArgMatches) -> Result<(), Box<dyn Error>> {
         match matches.subcommand() {
             Some(("quit", _)) => {
@@ -65,20 +80,31 @@ impl Repl<'_> {
             }
 
             Some(("write", mt)) => {
-                let service = mt.get_one::<String>("service").unwrap();
-                let characteristic = mt.get_one::<String>("characteristic").unwrap();
+                let mut service = mt.get_one::<String>("service").unwrap().clone();
+                let mut characteristic = mt.get_one::<String>("characteristic").unwrap().clone();
                 let payload = mt.get_one::<String>("payload").unwrap();
                 let response: bool = mt.contains_id("resp");
 
-                commands::write::write(self.bt, service, characteristic, payload, response).await?;
+                self.try_replacing_service_and_characteristics_with_preset_defs(
+                    &mut service,
+                    &mut characteristic,
+                );
+
+                commands::write::write(self.bt, &service, &characteristic, payload, response)
+                    .await?;
             }
 
             Some(("read", mt)) => {
-                let service = mt.get_one::<String>("service").unwrap();
-                let characteristic = mt.get_one::<String>("characteristic").unwrap();
+                let mut service = mt.get_one::<String>("service").unwrap().clone();
+                let mut characteristic = mt.get_one::<String>("characteristic").unwrap().clone();
                 let format = mt.get_one::<String>("format").unwrap();
 
-                commands::read::read(self.bt, service, characteristic, format).await?;
+                self.try_replacing_service_and_characteristics_with_preset_defs(
+                    &mut service,
+                    &mut characteristic,
+                );
+
+                commands::read::read(self.bt, &service, &characteristic, format).await?;
             }
 
             Some(("scan", mt)) => {
@@ -129,26 +155,41 @@ impl Repl<'_> {
             }
 
             Some(("indicate", mt)) => {
-                let service = mt.get_one::<String>("service").unwrap();
-                let characteristic = mt.get_one::<String>("characteristic").unwrap();
+                let mut service = mt.get_one::<String>("service").unwrap().clone();
+                let mut characteristic = mt.get_one::<String>("characteristic").unwrap().clone();
                 let format = mt.get_one::<String>("format").unwrap();
 
-                commands::indicate::indicate(self.bt, service, characteristic, format).await?;
+                self.try_replacing_service_and_characteristics_with_preset_defs(
+                    &mut service,
+                    &mut characteristic,
+                );
+
+                commands::indicate::indicate(self.bt, &service, &characteristic, format).await?;
             }
 
             Some(("notify", mt)) => {
-                let service = mt.get_one::<String>("service").unwrap();
-                let characteristic = mt.get_one::<String>("characteristic").unwrap();
+                let mut service = mt.get_one::<String>("service").unwrap().clone();
+                let mut characteristic = mt.get_one::<String>("characteristic").unwrap().clone();
                 let format = mt.get_one::<String>("format").unwrap();
 
-                commands::notify::notify(self.bt, service, characteristic, format).await?;
+                self.try_replacing_service_and_characteristics_with_preset_defs(
+                    &mut service,
+                    &mut characteristic,
+                );
+
+                commands::notify::notify(self.bt, &service, &characteristic, format).await?;
             }
 
             Some(("unsubscribe", mt)) => {
-                let service = mt.get_one::<String>("service").unwrap();
-                let characteristic = mt.get_one::<String>("characteristic").unwrap();
+                let mut service = mt.get_one::<String>("service").unwrap().clone();
+                let mut characteristic = mt.get_one::<String>("characteristic").unwrap().clone();
 
-                commands::unsubscribe::unsubscribe(self.bt, service, characteristic).await?;
+                self.try_replacing_service_and_characteristics_with_preset_defs(
+                    &mut service,
+                    &mut characteristic,
+                );
+
+                commands::unsubscribe::unsubscribe(self.bt, &service, &characteristic).await?;
             }
 
             Some(("preset", mt)) => {
