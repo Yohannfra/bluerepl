@@ -120,12 +120,18 @@ USAGE:
 ARGS:
     <service>           The service that contains the characteristic to subscribe to
     <characteristic>    The characteristic to subscribe to
+
+OPTIONS:
+    -f, --format <format>    Format to print the read value [default: hex] [possible values: bin,
 ```
 
 Example:
 ```bash
 # subscribe to a service indications
 >> indicate 0000180a-0000-1000-8000-00805f9b34fb 00002a24-0000-1000-8000-00805f9b34fb
+
+# subscribe to a service indications and print indications as text
+>> indicate 0000180a-0000-1000-8000-00805f9b34fb 00002a24-0000-1000-8000-00805f9b34fb -f text
 ```
 
 ---
@@ -165,12 +171,18 @@ USAGE:
 ARGS:
     <service>           The service that contains the characteristic to subscribe to
     <characteristic>    The characteristic to subscribe to
+
+OPTIONS:
+    -f, --format <format>    Format to print the read value [default: hex] [possible values: bin,
 ```
 
 Example:
 ```bash
 # subscribe to a service notifications
 >> notify 0000180a-0000-1000-8000-00805f9b34fb 00002a24-0000-1000-8000-00805f9b34fb
+
+# subscribe to a service notifications and print notifications as binary
+>> notify 0000180a-0000-1000-8000-00805f9b34fb 00002a24-0000-1000-8000-00805f9b34fb -f bin
 ```
 
 ---
@@ -230,15 +242,22 @@ USAGE:
 ARGS:
     <service>           The service that contains the characteristic to write
     <characteristic>    The characteristic to write
+
+OPTIONS:
+    -f, --format <format>    Format to print the read value [default: hex] [possible values: bin,
+                             hex, dec, text, hexdump]
 ```
 
 Example:
 ```bash
-# read the value of a characteristic with a 16 bits uuid
->> read 180f 2a19
-
-# read the value of a characteristic with a long uuid
+# read the value of a characteristic
 >> read 0000180a-0000-1000-8000-00805f9b34fb 00002a24-0000-1000-8000-00805f9b34fb
+
+# read the value of a characteristic and print the value as decimal
+>> read 0000180a-0000-1000-8000-00805f9b34fb 00002a24-0000-1000-8000-00805f9b34fb -f dec
+
+# read the value of a characteristic and print the value as text
+>> read 0000180a-0000-1000-8000-00805f9b34fb 00002a24-0000-1000-8000-00805f9b34fb -f text
 ```
 
 ---
