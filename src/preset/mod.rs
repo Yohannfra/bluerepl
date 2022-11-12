@@ -26,6 +26,7 @@ pub struct Preset {
 pub struct Device {
     name: Option<String>,
     address: Option<String>,
+    #[serde(skip_deserializing)]
     pub autoconnect: Option<bool>,
 }
 

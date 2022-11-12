@@ -236,7 +236,6 @@ impl Repl<'_> {
 
         if let Some(preset) = &self.preset {
             if preset.should_autoconnect() {
-                println!("autoconnect found in preset, running auto connection");
                 self.preset
                     .as_ref()
                     .unwrap()

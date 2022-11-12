@@ -1,6 +1,18 @@
 use super::Preset;
 
 impl Preset {
+    pub fn is_autoconnect_possible(&self) -> bool {
+        if let Some(device) = &self.device {
+            if device.autoconnect.unwrap_or(false)
+                && device.name.is_none()
+                && device.address.is_none()
+            {
+                return false;
+            }
+        }
+        true
+    }
+
     pub fn verify(&self) {
         // check if services and characteristics typed in commands descriptions are defined in
         // the preset
@@ -30,16 +42,6 @@ impl Preset {
                         );
                     }
                 }
-            }
-        }
-
-        // check that if autoconnect=true there is also device name or address
-        if let Some(device) = &self.device {
-            if device.autoconnect.unwrap_or(false)
-                && device.name.is_none()
-                && device.address.is_none()
-            {
-                panic!("You must provide a name or an address to use the autoconnect feature");
             }
         }
 

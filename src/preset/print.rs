@@ -13,12 +13,11 @@ impl Preset {
         // Device infos
         if let Some(device) = &self.device {
             table.add_row(vec![
-                "Device name\nDevice address\nDevice Autoconnect",
+                "Device name\nDevice address",
                 &format!(
-                    "{}\n{}\n{}",
+                    "{}\n{}",
                     device.name.as_ref().unwrap_or(&"".to_owned()),
                     device.address.as_ref().unwrap_or(&"".to_owned()),
-                    device.autoconnect.unwrap_or(false)
                 ),
             ]);
         }

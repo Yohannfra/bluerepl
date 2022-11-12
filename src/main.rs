@@ -29,7 +29,7 @@ struct Args {
     /// - bleuio
     ble_lib: String,
 
-    /// Override preset 'autoconnect' value with true
+    /// autoconnect to peripheral described in preset
     #[clap(short, long)]
     autoconnect: bool,
 }
@@ -53,6 +53,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
         let mut pr = Preset::new(preset_file).unwrap();
 
         if args.autoconnect {
+            if !pr.is_autoconnect_possible() {
+                panic!("A name or an address must be in the preset file to use the autoconnect feature");
+            }
             pr.device.as_mut().unwrap().autoconnect = Some(true);
         }
 

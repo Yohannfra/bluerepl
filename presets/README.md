@@ -19,7 +19,6 @@ $ bluerepl battery.toml
 +===========================================================+
 | Device name        | my_device                            |
 | Device address     | XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX |
-| Device Autoconnect | false                                |
 |--------------------+--------------------------------------|
 | Service            |                                      |
 |--------------------+--------------------------------------|

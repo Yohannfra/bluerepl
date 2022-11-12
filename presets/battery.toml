@@ -1,7 +1,6 @@
 [device]
 name = "my_device"
 address = "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
-autoconnect = false
 
 [services.battery]
 uuid = "180f"
