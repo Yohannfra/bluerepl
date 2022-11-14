@@ -1107,9 +1107,9 @@ checksum = "9e08d8363704e6c71fc928674353e6b7c23dcea9d82d7012c8faf2a3a025f8d0"
 
 [[package]]
 name = "str_to_bytes"
-version = "0.2.1"
+version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b240c4cbbd8141976628b66ea66a30ca9c2ae0843fa250429a43fee23f6af712"
+checksum = "ee3dfe481d649576b66ad7c2fe874ff2debdc01af11d39bed07d4933b05dccda"
 dependencies = [
  "regex",
  "shlex",
