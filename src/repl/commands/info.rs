@@ -3,12 +3,17 @@ use crate::controllers;
 use std::error::Error;
 
 use crate::controllers::BlePeripheralInfo;
+use crate::repl::commands;
 use comfy_table::{Attribute, Cell, Table};
 
 use crate::bluetooth_numbers::{characteristic_uuids, services_uuids};
 use crate::Preset;
 
-fn print_gatt_infos(infos: &BlePeripheralInfo, p: &Option<Preset>) {
+async fn print_gatt_infos(
+    bt: &mut dyn controllers::BleController,
+    infos: &BlePeripheralInfo,
+    p: &Option<Preset>,
+) {
     let mut table = Table::new();
 
     table.set_header(vec![
@@ -59,6 +64,15 @@ fn print_gatt_infos(infos: &BlePeripheralInfo, p: &Option<Preset>) {
                 vec_service[0].push_str("\n - Identifier");
                 vec_service[1].push_str(&format!("\n{}", identifier))
             }
+
+            if c.properties
+                .contains(controllers::CharacteristicProperties::READ)
+            {
+                let val_as_str = commands::read::read_as_str(bt, &s.uuid, &c.uuid, "hex").await;
+
+                vec_service[0].push_str("\n - Value");
+                vec_service[1].push_str(&format!("\n{}", val_as_str.unwrap()))
+            }
         }
         table.add_row(vec_service);
     }
@@ -71,7 +85,7 @@ pub async fn gatt(
     p: &Option<Preset>,
 ) -> Result<(), Box<dyn Error>> {
     let infos: BlePeripheralInfo = bt.get_peripheral_infos().await?;
-    print_gatt_infos(&infos, p);
+    print_gatt_infos(bt, &infos, p).await;
 
     Ok(())
 }
