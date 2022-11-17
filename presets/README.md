@@ -72,4 +72,75 @@ uuid = "0000beb6-0000-1000-8000-00805f9b34fb"
 
 ## Commands
 
+Commands is what makes presets so useful. Quick example of their usage before explaining the syntax and everything.
+
+To write a service without a command:
+```
+>> write color_service rgb_characteristic "0xff 0x00 0x00"
+```
+with a command:
+```
+>> preset command set_red
+```
+
+Which is much clearer and user friendly.
+
+The command used in this example would look like this
+
+```toml
+[commands.set_red]
+command_type = "write"
+service = "color_service"
+characteristic = "rgb_characteristic"
+payload = "0xff 0x00 0x00"
+```
+
+*command_type* can be any of:
+ - **write** 
+ - **read**
+ - **notify**
+ - **indicate**
+ - **unsubscribe**
+
+The fields **command_type**, **service** and characteristic** are mandatory for all commands.
+
+Commands of types **read**, **notify** and **service** can also have a format field which corresponds to the **-f** flag in the repl.
+By default the format is set to *hex* it can be set to any of **hex**, **text**, **binary**, **decimal** and **hexdump**
+
+Example:
+
+```toml
+[commands.read_manufacturer_name]
+command_type = "read"
+service = "dis"
+characteristic = "manufacturer_name"
+format = "text"
+```
+
 ## Functions
+
+Functions are a group of commands called one after the other with a specified delay between each.
+
+If the commands **set_red**, **clear** and **set_blue** are defined we can write a function to make the led blink like this.
+
+```toml
+[functions.blink_rb]
+commands_delay_ms = [1000, 500, 1000, 0]
+commands = ["set_red", "clear", "set_blue", "clear"]
+
+# this will be executed in this order:
+# set_red
+# wait 1000ms
+# clear
+# wait 500ms
+# set_blue
+# wait 1000ms
+# clear
+# wait 0ms
+```
+
+Call this function with
+
+```
+>> preset function blink_rb
+```
