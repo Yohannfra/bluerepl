@@ -2,16 +2,13 @@ use super::Preset;
 
 impl Preset {
     pub fn is_autoconnect_possible(&self) -> bool {
-        if let Some(device) = &self.device {
-            if device.autoconnect.unwrap_or(false)
-                && device.name.is_none()
-                && device.address.is_none()
-            {
-                return false;
-            }
-            return true;
+        let Some(device) = &self.device else {
+            return false;
+        };
+        if device.name.is_none() && device.address.is_none() {
+            return false;
         }
-        false
+        true
     }
 
     pub fn verify(&self) {
