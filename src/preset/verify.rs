@@ -9,8 +9,9 @@ impl Preset {
             {
                 return false;
             }
+            return true;
         }
-        true
+        false
     }
 
     pub fn verify(&self) {
