@@ -21,7 +21,7 @@ $ bluerepl battery.toml
 
 # Create a preset
 
-First take a look at existing [presets](presets/).
+First take a look at existing [presets](.).
 
 Presets files can contain 4 main sections:
 
