@@ -65,13 +65,34 @@ async fn print_gatt_infos(
                 vec_service[1].push_str(&format!("\n{}", identifier))
             }
 
+            // Characteristic value
             if c.properties
                 .contains(controllers::CharacteristicProperties::READ)
             {
-                let val_as_str = commands::read::read_as_str(bt, &s.uuid, &c.uuid, "hex").await;
+                let mut val_as_str = String::new();
+
+                if let Some(identifier) =
+                    characteristic_uuids::get_characteristic_identifier_from_uuid(&c.uuid)
+                {
+                    if identifier.contains("string") {
+                        val_as_str = commands::read::read_as_str(bt, &s.uuid, &c.uuid, "text")
+                            .await
+                            .unwrap();
+                    }
+                }
+
+                if val_as_str.is_empty() {
+                    val_as_str = commands::read::read_as_str(bt, &s.uuid, &c.uuid, "hex")
+                        .await
+                        .unwrap();
+
+                    if val_as_str.len() > 45 {
+                        val_as_str = val_as_str[0..50].to_owned() + " ...";
+                    }
+                }
 
                 vec_service[0].push_str("\n - Value");
-                vec_service[1].push_str(&format!("\n{}", val_as_str.unwrap()))
+                vec_service[1].push_str(&format!("\n{}", val_as_str))
             }
         }
         table.add_row(vec_service);
