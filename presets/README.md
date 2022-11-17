@@ -76,7 +76,7 @@ Commands is what makes presets so useful. Quick example of their usage before ex
 
 To write a service without a command:
 ```
->> write color_service rgb_characteristic "0xff 0x00 0x00"
+>> write 8e72bbe5-f777-5284-7849-b4a0b2ac70d2 0000beb6-0000-1000-8000-00805f9b34fb "0xff 0x00 0x00"
 ```
 with a command:
 ```
