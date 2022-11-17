@@ -58,8 +58,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
             }
             pr.device.as_mut().unwrap().autoconnect = Some(true);
         }
-
         repl.set_preset(pr);
+    } else if args.autoconnect {
+        panic!("-a --autoconnect can't be used without preset");
     }
+
     repl.start().await
 }
