@@ -123,6 +123,7 @@ ARGS:
 
 OPTIONS:
     -f, --format <format>    Format to print the read value [default: hex] [possible values: bin,
+                             hex, dec, text, hexdump]
 ```
 
 Example:
@@ -174,6 +175,7 @@ ARGS:
 
 OPTIONS:
     -f, --format <format>    Format to print the read value [default: hex] [possible values: bin,
+                             hex, dec, text, hexdump]
 ```
 
 Example:
