@@ -86,8 +86,9 @@ async fn print_gatt_infos(
                         .await
                         .unwrap();
 
+                    // crop value if it's too long
                     if val_as_str.len() > 45 {
-                        val_as_str = val_as_str[0..50].to_owned() + " ...";
+                        val_as_str = val_as_str[0..44].to_owned() + " ...";
                     }
                 }
 
