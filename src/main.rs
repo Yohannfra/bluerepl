@@ -15,6 +15,7 @@ use controllers::btleplug;
 use preset::Preset;
 use repl::Repl;
 use std::error::Error;
+use std::panic;
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
@@ -37,6 +38,10 @@ struct Args {
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     println!("bluerepl Version: {}", env!("CARGO_PKG_VERSION"));
+
+    panic::set_hook(Box::new(|e| {
+        eprintln!("{}", e);
+    }));
 
     let args = Args::parse();
 
