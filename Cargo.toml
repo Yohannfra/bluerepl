@@ -26,6 +26,7 @@ str_to_bytes = "0.2.3"
 lazy_static = "1.4.0"
 pre-commit = "0.5.2"
 rhexdump = "0.1.1"
+sprintf = "0.1.3"
 
 [package.metadata.precommit]
 fmt = "cargo fmt --check"
