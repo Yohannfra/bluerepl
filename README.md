@@ -4,10 +4,6 @@ bluerepl is a command line application to interact with Bluetooth Low Energy (BL
 
 It works on **Windows**, **Mac OS** and **Linux**.
 
-## Demo (without preset)
-
-## Demo (with preset)
-
 ## Installation
 
 ### Using crate.io
