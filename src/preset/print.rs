@@ -7,7 +7,7 @@ impl Preset {
 
         table.set_header(vec![
             Cell::new("File name:").add_attribute(Attribute::Bold),
-            Cell::new(&self.fp.to_string_lossy()),
+            Cell::new(self.fp.to_string_lossy()),
         ]);
 
         // Device infos
