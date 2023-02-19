@@ -80,4 +80,37 @@ impl Preset {
         }
         println!("{table}");
     }
+
+    pub fn print_commands(&self) {
+        // TODO change data orientation
+
+        if let Some(commands) = &self.commands {
+            let mut table = Table::new();
+
+            table.add_row(vec![Cell::new("Commands").add_attribute(Attribute::Bold)]);
+            for (key, data) in commands {
+                let mut col1: String = "Name\nType\nService\nCharacteristic".to_owned();
+                let mut col2: String = format!(
+                    "{}\n{}\n{}\n{}",
+                    key, data.command_type, data.service, data.characteristic
+                );
+
+                if data.command_type == "write" {
+                    col1.push_str("\nPayload");
+                    col2.push_str(&format!("\n{}", data.payload.as_ref().unwrap()));
+                }
+
+                if data.command_type == "read"
+                    || data.command_type == "indicate"
+                    || data.command_type == "notify"
+                {
+                    col1.push_str("\nFormat");
+                    col2.push_str(&format!("\n{}", data.format));
+                }
+
+                table.add_row(vec![col1, col2]);
+            }
+            println!("{table}");
+        }
+    }
 }

@@ -202,12 +202,17 @@ impl Repl<'_> {
                 } else {
                     match mt.subcommand() {
                         Some(("command", arg)) => {
-                            let command_name = arg.get_one::<String>("command_name").unwrap();
-                            self.preset
-                                .as_ref()
-                                .unwrap()
-                                .run_command(self.bt, command_name)
-                                .await?;
+                            let command_name = arg.get_one::<String>("command_name");
+
+                            if command_name.is_none() {
+                                self.preset.as_ref().unwrap().print_commands();
+                            } else {
+                                self.preset
+                                    .as_ref()
+                                    .unwrap()
+                                    .run_command(self.bt, command_name.unwrap())
+                                    .await?;
+                            }
                         }
                         Some(("function", arg)) => {
                             let function_name = arg.get_one::<String>("function_name").unwrap();

@@ -109,7 +109,7 @@ pub fn cli() -> Command<'static> {
             .about("Print preset informations or run preset commands/functions")
             .subcommands(vec![
                 Command::new("command").about("Run preset command").args(&[
-                    Arg::new("command_name").help("The command to run").required(true),
+                    Arg::new("command_name").help("The command to run").required(false),
                     ],
                 ),
                 Command::new("function").about("Run preset function").args(&[
