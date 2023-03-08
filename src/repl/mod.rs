@@ -79,6 +79,11 @@ impl Repl<'_> {
                 commands::clear::run();
             }
 
+            Some(("sleep", mt)) => {
+                let time_ms = *mt.get_one::<u64>("time_ms").unwrap();
+                commands::sleep::run(time_ms);
+            }
+
             Some(("write", mt)) => {
                 let mut service = mt.get_one::<String>("service").unwrap().clone();
                 let mut characteristic = mt.get_one::<String>("characteristic").unwrap().clone();

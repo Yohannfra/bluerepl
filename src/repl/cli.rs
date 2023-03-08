@@ -27,6 +27,14 @@ pub fn cli() -> Command<'static> {
             .about("Clear the terminal")
             .help_template(COMMAND_TEMPLATE))
 
+        // sleep
+        .subcommand(
+            Command::new("sleep")
+            .about("Wait and do nothing for a specified amount of time")
+            .args(&[
+                Arg::new("time_ms").help("Time to sleep in milliseconds").required(true).value_parser(clap::value_parser!(u64)),
+            ]).help_template(COMMAND_TEMPLATE))
+
         // quit
         .subcommand(
             Command::new("quit")

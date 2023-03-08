@@ -49,6 +49,7 @@ COMMANDS:
     quit           Quit the REPL
     read           Read the value of a characteristic
     scan           Search for BLE devices around
+    sleep          Wait and do nothing for a specified amount of time
     unsubscribe    Unsubscribe from the notifications or indications of a characteristic
     write          Write a value to a characteristic
 

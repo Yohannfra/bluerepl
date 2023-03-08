@@ -3,6 +3,7 @@
 ## Summary
 
 - [clear](#clear)
+- [sleep](#sleep)
 - [connect](#connect)
 - [disconnect](#disconnect)
 - [help](#help)
@@ -21,7 +22,7 @@
 ## clear
 
 ```
-Clear the terminal 
+Clear the terminal
 
 USAGE:
     clear
@@ -31,6 +32,29 @@ Example:
 ```bash
 # clear the screen
 >> clear
+```
+
+---
+
+## sleep
+
+```
+Wait and do nothing for a specified amount of time
+
+USAGE:
+    sleep <time_ms>
+
+ARGS:
+    <time_ms>    Time to sleep in milliseconds
+
+OPTIONS:
+    -h, --help    Print help information
+```
+
+Example:
+```bash
+# sleep for 500ms
+>> sleep 500
 ```
 
 ---
@@ -104,7 +128,7 @@ Examples:
 # global help message
 >> help
 
-# help about a specific command 
+# help about a specific command
 >> help read
 ```
 ---
