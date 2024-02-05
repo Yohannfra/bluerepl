@@ -1003,9 +1003,9 @@ checksum = "dbb5fb1acd8a1a18b3dd5be62d25485eb770e05afb408a9627d14d451bae12da"
 
 [[package]]
 name = "rhexdump"
-version = "0.1.1"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c5e9af64574935e39f24d1c0313a997c8b880ca0e087c888bc6af8af31579847"
+checksum = "9a92cbe1a3dd221e3777fef339115d3b85e17a538668e03a0f3ae9c6a98351c7"
 
 [[package]]
 name = "rustc-demangle"
