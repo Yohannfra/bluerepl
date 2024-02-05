@@ -1,4 +1,4 @@
-use rhexdump;
+use rhexdump::prelude::*;
 
 use std::str;
 
@@ -30,7 +30,7 @@ pub fn bytes_to_str(bytes: &Vec<u8>, format: &str) -> String {
         }
         "dec" => out.push_str(&format!("{:?}", bytes)),
         "text" => out.push_str(str::from_utf8(bytes).unwrap_or("Invalid string")),
-        "hexdump" => out.push_str(&rhexdump::hexdump(bytes)),
+        "hexdump" => out.push_str(&rhexdumps!(bytes)),
         _ => panic!("Unknown format: '{}'", format),
     }
 
