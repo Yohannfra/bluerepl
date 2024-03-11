@@ -92,7 +92,7 @@ name = "bluerepl"
 version = "0.1.8"
 dependencies = [
  "async-trait",
- "bitflags 1.3.2",
+ "bitflags 2.4.2",
  "btleplug",
  "clap",
  "comfy-table",
