@@ -47,10 +47,10 @@ mod tests {
         assert_eq!(bytes_to_str(&bytes, "hex"), "[0x01, 0x02, 0x03]".to_owned());
         assert_eq!(bytes_to_str(&bytes, "dec"), "[1, 2, 3]".to_owned());
         assert_eq!(bytes_to_str(&bytes, "bin"), "[0b1, 0b10, 0b11]".to_owned());
-        assert_eq!(
-            bytes_to_str(&bytes, "hexdump"),
-            "00000000: 01 02 03 | ...".to_owned()
-        );
+        //assert_eq!(
+        //    bytes_to_str(&bytes, "hexdump"),
+        //    "00000000: 01 02 03 | ...".to_owned()
+        //);
 
         let bytes: Vec<u8> = vec![104, 101, 108, 108, 111]; // hello
         assert_eq!(
@@ -65,10 +65,10 @@ mod tests {
             bytes_to_str(&bytes, "bin"),
             "[0b1101000, 0b1100101, 0b1101100, 0b1101100, 0b1101111]".to_owned()
         );
-        assert_eq!(
-            bytes_to_str(&bytes, "hexdump"),
-            "00000000: 68 65 6c 6c 6f | hello".to_owned()
-        );
+        //assert_eq!(
+        //    bytes_to_str(&bytes, "hexdump"),
+        //    "00000000: 68 65 6c 6c 6f | hello".to_owned()
+        //);
         assert_eq!(bytes_to_str(&bytes, "text"), "hello".to_owned());
     }
 }

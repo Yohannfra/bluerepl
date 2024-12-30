@@ -47,7 +47,7 @@ impl BleController for BtleplugController {
             let name = properties
                 .local_name
                 .unwrap_or_else(|| String::from("unknown"));
-            let mut company_code = std::usize::MAX;
+            let mut company_code = usize::MAX;
             if let Some((code, _)) = properties.manufacturer_data.iter().next() {
                 company_code = *code as usize;
             }

@@ -25,6 +25,7 @@ pub struct BlePeripheral {
 }
 
 bitflags! {
+    #[derive(Debug)]
     pub struct CharacteristicProperties: u8 {
         const UNKNOWN                = 0b00000000;
         const READ                   = 0b00000001;

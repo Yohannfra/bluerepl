@@ -1,4 +1,5 @@
 use rustyline::error::ReadlineError;
+use rustyline::history::FileHistory;
 use rustyline::Editor;
 
 mod cli;
@@ -12,7 +13,7 @@ use std::error::Error;
 
 pub struct Repl<'a> {
     bt: &'a mut dyn BleController,
-    editor: Editor<()>,
+    editor: Editor<(), FileHistory>,
     preset: Option<Preset>,
 }
 
@@ -22,7 +23,7 @@ impl Repl<'_> {
     pub async fn new(bt: &mut dyn BleController) -> Repl {
         Repl {
             bt,
-            editor: Editor::<()>::new().unwrap(),
+            editor: Editor::<(), FileHistory>::new().unwrap(),
             preset: None,
         }
     }
@@ -35,7 +36,7 @@ impl Repl<'_> {
         let readline = self.editor.readline(">> ");
         match readline {
             Ok(line) => {
-                self.editor.add_history_entry(line.as_str());
+                let _ = self.editor.add_history_entry(line.as_str());
                 self.editor.save_history(HISTORY_FP).unwrap();
                 line
             }
